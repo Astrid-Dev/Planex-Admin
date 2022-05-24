@@ -1,0 +1,82 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true && canUploadFile !== null">
+            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile">
+              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
+            </div>
+
+            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile && !hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
+
+              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            </div>
+
+            <div class="card-block" *ngIf="hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.INCOHERENTDATASLIST' | translate}}</h5>
+
+              <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                  <thead>
+                  <tr>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.CODE' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.ENTITLED' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.ENGLISHENTITLED' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.SEMESTER' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.ISOPTIONAL' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.HASTUTORIAL' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.CLASSROOM' | translate}}</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let teachingUnit of badTeachingUnits">
+                    <td class="width-200">{{teachingUnit.code}}</td>
+                    <td class="width-200">{{teachingUnit.intitule}}</td>
+                    <td class="width-200">{{teachingUnit.intitule_en}}</td>
+                    <td class="width-200">{{teachingUnit.semestre}}</td>
+                    <td class="width-200">{{getBooleanText(teachingUnit.est_optionnelle)}}</td>
+                    <td class="width-200">{{getBooleanText(teachingUnit.possede_td)}}</td>
+                    <td class="width-200">
+                      <select [(ngModel)]="teachingUnit.classe" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.TEACHINGUNITS.DEFAULTVALUE' | translate">
+                          <option [value]="teachingUnit.defaultClasse">{{teachingUnit.defaultClasse}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.TEACHINGUNITS.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let classroom of getClassrooms()" [value]="classroom.code">{{classroom.code}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+
+                <div class="mt-2 center">
+                  <button (click)="continueReading()" class="btn btn-primary">{{'FILESINPUT.FILEIMPORT.CONTINUE' | translate}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && canUploadFile === null">
+            <img width="250px" height="250px" src="assets/images/required.jpg"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+          </div>
+          <div class="page-loader" *ngIf="hasLoadedDatas === null">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+            <img src="assets/images/loading-error2.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="loadDatas()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+

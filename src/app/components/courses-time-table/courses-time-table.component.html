@@ -1,0 +1,62 @@
+<div class="time-table p-2" [id]="id">
+  <div class="row university-name">
+    <h4 class="col-md-6">{{faculty.universite}}</h4>
+    <h4 class="col-md-6">{{faculty.universite_en}}</h4>
+  </div>
+  <div class="row faculty-name">
+    <h4 class="col-md-6">{{faculty.nom}}</h4>
+    <h4 class="col-md-6">{{faculty.nom_en}}</h4>
+  </div>
+
+  <div class="row programming-service">
+    <h5 class="col-md-6">{{faculty.service_programmation}}</h5>
+    <h5 class="col-md-6">{{faculty.service_programmation_en}}</h5>
+  </div>
+
+  <div class="row time-table-label">
+    <h5 class="col-md-12">Emploi du temps | Time table</h5>
+  </div>
+  <div class="row semester">
+    <h5 class="col-md-12">Semestre__{{faculty.semestre}}__Année académique &nbsp;&nbsp;{{printedAcademicYear}}&nbsp;&nbsp; Academic year__{{faculty.semestre}}__semester</h5>
+  </div>
+  <div class="row sector">
+    <h5 class="col-md-12">{{printedSector}}</h5>
+  </div>
+  <div class="row classroom">
+    <h5 class="col-md-12">{{classroom.infos?.code}}</h5>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-bordered mb-0 table-hover">
+      <thead>
+      <tr>
+        <th class="divide">{{'COURSESTIMETABLE.HOURS' | translate}}</th>
+        <th *ngFor="let day of days;">{{getDayName(day)}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let period of periods; index as periodIndex;">
+        <th>{{getTimeName(period, "debut") + " - " + getTimeName(period, "fin")}}</th>
+        <td [className]="readOnly ? '' : 'clickable'" (click)="onCeilClick(dayIndex, periodIndex)" *ngFor="let day2 of days; index as dayIndex">
+            <span class="text-bold-600 planning-activity">{{getPlanningActivityCodeAt(dayIndex, periodIndex)}}</span>
+            <span class="text-bold-600 planning-room">{{getPlanningRoomCodeAt(dayIndex, periodIndex).room}} <em *ngIf="getPlanningRoomCodeAt(dayIndex, periodIndex).hasGroup">{{getPlanningRoomCodeAt(dayIndex, periodIndex).group}}</em></span>
+            <span class="text-bold-600 planning-teacher1">{{getPlanningTeacherAt(dayIndex, periodIndex, 1)}}</span>
+            <span class="text-bold-600 planning-teacher2">{{getPlanningTeacherAt(dayIndex, periodIndex, 2)}}</span>
+            <span class="text-bold-600 planning-teacher3">{{getPlanningTeacherAt(dayIndex, periodIndex, 3)}}</span>
+            <span class="text-bold-600 planning-teacher4">{{getPlanningTeacherAt(dayIndex, periodIndex, 4)}}</span>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="row text-md-center mt-3 mb-1" *ngIf="!readOnly">
+  <div *ngIf="isSaving">
+    <i class=" fa fa-spinner fa-2x fa-pulse text-primary"></i>
+    Veuillez patienter...
+  </div>
+  <button *ngIf="!isSaving" class="btn btn-primary mr-2" (click)="onSave()">{{'COURSESTIMETABLE.SAVE' | translate}}</button>
+  <button *ngIf="!isSaving" class="btn btn-danger" (click)="onExport()"><i class="fa fa-file-pdf-o"></i> {{'COURSESTIMETABLE.EXPORT' | translate}}</button>
+</div>
+<div *ngIf="!readOnly" style="color: white">.</div>
+<app-modal-updating-courses-planning *ngIf="!readOnly" (onModify)="updateACeil($event)"></app-modal-updating-courses-planning>

@@ -1,0 +1,37 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <a class="fullscreen-icon" data-action="expand"><i class="ft-maximize"></i></a>
+          <div class="card-body collapse in" *ngIf="hasLoadedDatasWithSuccess && canDisplay">
+            <app-classrooms-list [isForPlanning]="true" (onSelectGlobalPlanning)="onSelectAAllClassrooms()" (onSelectSectorPlanning)="onSelectSectorClassrooms($event)" (onSelectClassroom)="onSelectClassroom($event)" [list]="classrooms" *ngIf="!hasSelectedClassroom && !hasSelectedGlobalPlanning" [load]="false"></app-classrooms-list>
+            <app-courses-time-table [readOnly]="false" (onPlanningUpdated)="loadDatas()" [classroom]="selectedClassroomCode" *ngIf="canShowTimeTable"></app-courses-time-table>
+            <app-multi-courses-time-table *ngIf="canShowMultiTimeTables" [filter]="filterResult"></app-multi-courses-time-table>
+            <div class="not-configured-time center flex-column" *ngIf="canShowTimeTable && !timeTypeHasBeenConfigured">
+              <img width="200px" height="200px" src="assets/images/not-configured.png"/>
+              <h6 class="text-italic mt-2">{{'LOADINGERROR.TIMETYPE' | translate}} {{currentSectorCode}}</h6>
+              <button class="btn btn-primary" (click)="goToSectorConfigurationTime()">{{'SUBMITS.CONFIGURE' | translate}}</button>
+            </div>
+          </div>
+          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatasWithSuccess && !canDisplay">
+            <img width="250px" height="250px" src="assets/images/required.jpg"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+          </div>
+          <div class="page-loader" *ngIf="isLoading">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatasWithError">
+            <img src="assets/images/loading-error.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="retry()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

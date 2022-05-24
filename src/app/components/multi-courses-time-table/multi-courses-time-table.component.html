@@ -1,0 +1,15 @@
+
+<div *ngFor="let classroom of classrooms">
+  <h6 class="card-subtitle line-on-side text-muted text-xs-center font-small-3 pt-2 mb-2">
+    <span>{{classroom.code}}</span>
+  </h6>
+  <app-courses-time-table [classroom]="classroom.code"></app-courses-time-table>
+  <h6 class="card-subtitle line-on-side text-muted text-xs-center font-small-3 pt-2 mt-2 mb-2">
+    <button class="btn btn-primary" (click)="onSelectClassroom(classroom)">Modifier</button>
+  </h6>
+</div>
+
+<div class="bg-danger flat-button text-white" title="Exporter" (click)="export()">
+  <i *ngIf="!isExporting" class="fa fa-file-pdf-o"></i>
+  <i *ngIf="isExporting" class="fa fa-spinner fa-pulse"></i>
+</div>

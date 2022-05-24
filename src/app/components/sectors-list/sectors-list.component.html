@@ -1,0 +1,34 @@
+<div class="pt-2"></div>
+<div *ngIf="hasLoadedDatas === true && sectors.length > 0">
+  <div class="header-search">
+    <h4 class="col-md-8 col-sm-12">{{'SECTORSLIST.SELECT' | translate}}</h4>
+    <div class="form-group col-md-4 col-sm-12">
+      <i class="fa fa-search"></i>
+      <input type="search" [(ngModel)]="searchText" (ngModelChange)="filter()" class="form-control" placeholder="{{'SECTORSLIST.SEARCH' | translate}}"/>
+    </div>
+  </div>
+
+  <div class="list-contain" *ngIf="sectorsList.length > 0">
+    <div (click)="onChooseSector(sector)" class="sector-item cursor-pointer flex-column center" [title]="getSectorEntitled(sector)" *ngFor="let sector of sectorsList;">
+      <h5>{{sector.code}}</h5>
+      <div class="text-italic">
+        <span class="sector-mini-info">{{getTimeTypeDescription(sector.typeHoraireId)}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="text-italic center no-result-found" *ngIf="sectorsList.length === 0">
+    {{'SECTORSLIST.NORESULTFOUND' | translate}}
+  </div>
+</div>
+
+<div class="page-loader" *ngIf="hasLoadedDatas === null">
+  <i class="fa fa-refresh fa-pulse text-primary"></i>
+</div>
+<div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+  <img src="assets/images/loading-error.png"/>
+  <button class="btn btn-primary" (click)="loadSectors()">{{'SECTORSLIST.RETRY' | translate}}</button>
+</div>
+<div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && sectors.length === 0">
+  <img width="250px" height="250px" src="assets/images/required.jpg"/>
+  <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+</div>

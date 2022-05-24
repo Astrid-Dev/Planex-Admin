@@ -1,0 +1,49 @@
+.university-name, .faculty-name{
+  h4:first-child{
+    text-align: left;
+  }
+  h4:last-child{
+    text-align: right;
+  }
+
+  h4{
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+}
+
+.programming-service{
+  h5:first-child{
+    text-align: left;
+  }
+  h5:last-child{
+    text-align: right;
+  }
+  h5{
+    text-transform: none !important;
+  }
+}
+
+.time-table-label, .semester, .classroom, .sector{
+  text-align: center;
+  h5{
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+}
+
+th, td{
+  text-align: center;
+  vertical-align: middle;
+}
+
+td span{
+  display: block;
+}
+
+td.clickable{
+  &:hover{
+    border: 3px dashed #3BAFDA;
+    cursor: pointer;
+  }
+}

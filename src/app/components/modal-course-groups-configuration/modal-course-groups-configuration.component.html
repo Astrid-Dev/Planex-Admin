@@ -1,0 +1,79 @@
+<ngx-smart-modal #courseGroupsDefinition identifier="courseGroupsDefinition" >
+  <div *ngIf="hasData">
+    <div class="card-header">
+      <div class="card-title">
+        <h3> {{classroom.code}}</h3>
+      </div>
+    </div>
+    <div style="min-width: 500px">
+      <div class="center">
+        <div class="form-group">
+          <fieldset class="radio">
+            <label>
+              <input
+                type="radio"
+                id="choice1"
+                name="dividedClassroom"
+                value="no"
+                [(ngModel)]="dividedClassroom"
+                (ngModelChange)="onChoiceChange($event)"
+                style="margin-right: 20px;" >
+              {{'CONFIGURATIONS.COURSESGROUPS.DONOTDIVIDE' | translate}}
+            </label>
+          </fieldset>
+          <fieldset class="radio">
+            <label>
+              <input
+                type="radio"
+                id="choice2"
+                name="dividedClassroom"
+                value="yes"
+                [(ngModel)]="dividedClassroom"
+                (ngModelChange)="onChoiceChange($event)"
+                style="margin-right: 20px;" >
+              {{'CONFIGURATIONS.COURSESGROUPS.DIVIDE' | translate}}
+            </label>
+          </fieldset>
+        </div>
+      </div>
+      <div class="flex-column center" *ngIf="canCreateGroups">
+        <div class="mt-2 mb-2">
+          <div class="row col-sm-12 col-md-12" *ngFor="let group of groups; index as i">
+            <fieldset class="form-group col-md-4 col-sm-3">
+              <label [htmlFor]="'group-name'+i">{{'CONFIGURATIONS.COURSESGROUPS.NAME' | translate}}</label>
+              <input class="form-control" [(ngModel)]="group.name" disabled [id]="'groupe-name'+i"/>
+            </fieldset>
+            <fieldset class="form-group col-md-2 col-sm-3">
+              <label [htmlFor]="'start-letter-group'+i">{{'CONFIGURATIONS.COURSESGROUPS.START' | translate}}</label>
+              <select class="form-control" [(ngModel)]="group.startLetter" (ngModelChange)="onStartGroupLetterChange($event, i)" [id]="'start-letter-group'+i">
+                <option *ngFor="let letter of group.possiblesStartLetters" [value]="letter">{{letter}}</option>
+              </select>
+            </fieldset>
+            <fieldset class="form-group col-md-2 col-sm-3">
+              <label [htmlFor]="'end-letter-group'+i">{{'CONFIGURATIONS.COURSESGROUPS.END' | translate}}</label>
+              <select class="form-control" [(ngModel)]="group.endLetter" (ngModelChange)="onEndGroupLetterChange($event, i)" [id]="'end-letter-group'+i" [value]="">
+                <option *ngFor="let letter of group.possiblesEndLetters" [value]="letter">{{letter}}</option>
+              </select>
+            </fieldset>
+            <fieldset class="form-group col-md-3 col-sm-3">
+              <label [htmlFor]="'students-number-group'+i">{{'CONFIGURATIONS.COURSESGROUPS.EFFECTIVE' | translate}}</label>
+              <input class="form-control" placeholder="0" [(ngModel)]="group.studentsNumber" disabled [id]="'students-number-group'+i"/>
+            </fieldset>
+            <div *ngIf="i > 1" class="form-group col-md-1 col-sm-12 center" style="height: 100%; padding-top: 27px">
+              <i class="text-danger fa fa-times fa-2x cursor-pointer" (click)="deleteGroup(i)"></i>
+            </div>
+          </div>
+          <div class="form-group col-sm-12">
+            <button type="button" class="btn btn-min-width btn-outline-success" (click)="addGroup()"><i class="fa fa-plus"></i> {{'CONFIGURATIONS.COURSESGROUPS.NEWGROUP' | translate}}</button>
+          </div>
+        </div>
+      </div>
+      <div class="mt-2 flex-row center">
+        <i *ngIf="isLoading" class=" fa fa-spinner fa-2x fa-pulse text-primary"></i>
+        <button *ngIf="!isLoading" class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+        <button *ngIf="!isLoading" class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+      </div>
+    </div>
+  </div>
+
+</ngx-smart-modal>

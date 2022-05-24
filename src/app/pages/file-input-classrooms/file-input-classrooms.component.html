@@ -1,0 +1,89 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true && canUploadFile !== null">
+            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile">
+              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
+            </div>
+
+            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile && !hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
+
+              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            </div>
+
+            <div class="card-block" *ngIf="hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.INCOHERENTDATASLIST' | translate}}</h5>
+
+              <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                  <thead>
+                  <tr>
+                    <th>{{'FILESINPUT.CLASSROOMS.CODE' | translate}}</th>
+                    <th>{{'FILESINPUT.CLASSROOMS.ENTITLED' | translate}}</th>
+                    <th>{{'FILESINPUT.CLASSROOMS.ENGLISHENTITLED' | translate}}</th>
+                    <th>{{'FILESINPUT.CLASSROOMS.SECTOR' | translate}}</th>
+                    <th>{{'FILESINPUT.CLASSROOMS.LEVEL' | translate}}</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let classroom of badsClassrooms">
+                    <td class="width-200">{{classroom.code}}</td>
+                    <td class="width-200">{{classroom.intitule}}</td>
+                    <td class="width-200">{{classroom.intitule_en}}</td>
+                    <td class="width-200" *ngIf="classroom.filiereId === null">
+                      <select [(ngModel)]="classroom.filiere" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.CLASSROOMS.DEFAULTVALUE' | translate">
+                          <option [value]="classroom.defaultFiliere">{{classroom.defaultFiliere}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.CLASSROOMS.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let sector of getSectors()" [value]="sector.code">{{sector.code}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="classroom.filiereId !== null">{{classroom.filiere}}</td>
+                    <td class="width-200" *ngIf="classroom.niveauId === null">
+                      <select [(ngModel)]="classroom.niveau" class="select2-theme form-control" >
+                        <optgroup label="Valeur par défaut">
+                          <option [value]="classroom.defaultNiveau">{{classroom.defaultNiveau}}</option>
+                        </optgroup>
+                        <optgroup label="Valeurs possibles">
+                          <option *ngFor="let level of getLevels()" [value]="level.code">{{level.code}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="classroom.niveauId !== null">{{classroom.niveau}}</td>
+                  </tr>
+                  </tbody>
+                </table>
+
+                <div class="mt-2 center">
+                  <button (click)="continueReading()" class="btn btn-primary">{{'FILESINPUT.FILEIMPORT.CONTINUE' | translate}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-loader" *ngIf="hasLoadedDatas === null">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && canUploadFile === null">
+            <img width="250px" height="250px" src="assets/images/required.jpg"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+            <img src="assets/images/loading-error2.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="loadDatas()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

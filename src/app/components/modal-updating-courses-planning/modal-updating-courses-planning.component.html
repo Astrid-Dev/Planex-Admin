@@ -1,0 +1,202 @@
+<ngx-smart-modal #coursesPlanningModal identifier="coursesPlanningModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{data?.title}}</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.ACTIVITY' | translate}}</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #activity
+              [data]="activities"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate1"
+              [notFoundTemplate]="notFoundTemplate1"
+              (selected)='onSelectActivity($event)'
+              (inputChanged)='onActivityChange($event)'
+              (inputCleared)="onUnselectActivity()"></ng-autocomplete>
+            <ng-template #itemTemplate1 let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate1 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+      <div [className]="divideClassroom === 'yes' ? 'col-md-6 mb-1' : 'col-md-12 mb-1'" *ngIf="canShowParticipationChoice">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.PARTICIPATION' | translate}}</label>
+          <select class="form-control" [(ngModel)]="divideClassroom" (ngModelChange)="onDivideClassroomStatusChange($event)">
+            <option value="no">{{'COURSESTIMETABLE.ALLTHECLASS' | translate}}</option>
+            <option value="yes">{{'COURSESTIMETABLE.CHOOSEGROUP' | translate}}</option>
+          </select>
+        </fieldset>
+      </div>
+      <div class="col-md-6 mb-1" *ngIf="divideClassroom === 'yes'">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.INVOLVEDGROUP' | translate}}</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #group
+              [data]="possiblesGroups"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate7"
+              [notFoundTemplate]="notFoundTemplate7"
+              (selected)='onSelectGroup($event)'
+              (inputChanged)='onGroupChange($event)'
+              (inputCleared)="onUnselectGroup()"></ng-autocomplete>
+            <ng-template #itemTemplate7 let-item>
+              <a>
+                {{item.name}}<br/>
+                <span style='font-size: 0.7em; color: red;'>
+                  {{item?.description}}
+                </span>
+              </a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate7 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-md-12 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.ROOM' | translate}}</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #room
+              [data]="possiblesRooms"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate2"
+              [notFoundTemplate]="notFoundTemplate2"
+              (selected)='onSelectRoom($event)'
+              (inputChanged)='onRoomChange($event)'
+              (inputCleared)="onUnselectRoom()"
+              [disabled]="!canSelectRoom"></ng-autocomplete>
+            <ng-template #itemTemplate2 let-item>
+              <a>
+                {{item.name}}<br/>
+                <span style='font-size: 0.7em; color: red;'>
+                  {{item.description}}
+                </span>
+              </a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate2 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+
+      <div class="col-md-6 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.TEACHER' | translate}}1</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #teacher1
+              [data]="possiblesTeachers1"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate3"
+              [notFoundTemplate]="notFoundTemplate3"
+              (selected)='onSelectTeacher($event, 1)'
+              (inputChanged)='onTeacherChange($event, 1)'
+              (inputCleared)="onUnselectTeacher(1)"
+              [disabled]="!canSelectTeacher(1)"></ng-autocomplete>
+            <ng-template #itemTemplate3 let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate3 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-md-6 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.TEACHER' | translate}}2</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #teacher2
+              [data]="possiblesTeachers2"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate4"
+              [notFoundTemplate]="notFoundTemplate4"
+              (selected)='onSelectTeacher($event, 2)'
+              (inputChanged)='onTeacherChange($event, 2)'
+              (inputCleared)="onUnselectTeacher(2)"
+              [disabled]="!canSelectTeacher(2)"></ng-autocomplete>
+            <ng-template #itemTemplate4 let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate4 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-md-6 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.TEACHER' | translate}}3</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #teacher3
+              [data]="possiblesTeachers3"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate5"
+              [notFoundTemplate]="notFoundTemplate5"
+              (selected)='onSelectTeacher($event, 3)'
+              (inputChanged)='onTeacherChange($event, 3)'
+              (inputCleared)="onUnselectTeacher(3)"
+              [disabled]="!canSelectTeacher(3)"></ng-autocomplete>
+            <ng-template #itemTemplate5 let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate5 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+      <div class="col-md-6 mb-1">
+        <fieldset class="form-group">
+          <label>{{'COURSESTIMETABLE.TEACHER' | translate}}4</label>
+          <div class="ng-autocomplete">
+            <ng-autocomplete
+              #teacher4
+              [data]="possiblesTeachers4"
+              [searchKeyword]="searchWordItem"
+              [itemTemplate]="itemTemplate6"
+              [notFoundTemplate]="notFoundTemplate6"
+              (selected)='onSelectTeacher($event, 4)'
+              (inputChanged)='onTeacherChange($event, 4)'
+              (inputCleared)="onUnselectTeacher(4)"
+              [disabled]="!canSelectTeacher(4)"></ng-autocomplete>
+            <ng-template #itemTemplate6 let-item>
+              <a [innerHTML]="item.name"></a>
+            </ng-template>
+
+            <ng-template #notFoundTemplate6 let-notFound>
+              <div [innerHTML]="notFound"></div>
+            </ng-template>
+          </div>
+        </fieldset>
+      </div>
+    </div>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

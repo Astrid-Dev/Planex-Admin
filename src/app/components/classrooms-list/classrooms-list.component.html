@@ -1,0 +1,58 @@
+<div class="pt-2"></div>
+<div *ngIf="hasLoadedDatas === true && classrooms.length > 0">
+  <div class="header-search">
+    <h4 class="col-md-6 col-sm-12"> {{'CLASSROOMSLIST.SELECTCLASSROOM' | translate}}</h4>
+    <div class="form-group col-md-6 col-sm-12">
+      <i class="fa fa-search"></i>
+      <div class="flex-row">
+        <select [(ngModel)]="prefferdSectorId" (ngModelChange)="filter()" class="form-control">
+          <option value="-1">{{'CLASSROOMSLIST.ALLSECTORS' | translate}}</option>
+          <option *ngFor="let sector of sectors" [value]="sector.id">{{sector.code}}</option>
+        </select>
+        <select [(ngModel)]="prefferdLevelId" (ngModelChange)="filter()" class="form-control">
+          <option value="-1">{{'CLASSROOMSLIST.ALLLEVELS' | translate}}</option>
+          <option *ngFor="let level of levels" [value]="level.id">{{level.code}}</option>
+        </select>
+        <input type="search" class="form-control" [(ngModel)]="searchText" (ngModelChange)="filter()" placeholder="{{'CLASSROOMSLIST.SEARCH' | translate}}"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="list-contain" *ngIf="classroomsList.length > 0">
+    <div (click)="onAllClassroomsClick()" class="classroom-item all-classrooms cursor-pointer flex-column center" *ngIf="showGlobalPlanningItem">
+      <h5>{{'PLANNINGS.GLOBALPLANNING' | translate}}</h5>
+      <div class="text-italic">
+        <span class="classroom-mini-info">{{'PLANNINGS.GLOBALPLANNINGDESCRIP' | translate}}</span>
+      </div>
+    </div>
+    <div (click)="onSectorPlanningClick()" class="classroom-item one-sector cursor-pointer flex-column center" *ngIf="showSectorPlanningItem">
+      <h5>{{'PLANNINGS.SECTORPLANNING' | translate}} {{getPreferredSectorCode()}}</h5>
+      <div class="text-italic">
+        <span class="classroom-mini-info">{{'PLANNINGS.SECTORPLANNINGDESCRIP' | translate}} {{getPreferredSectorCode()}}</span>
+      </div>
+    </div>
+    <div (click)="onChooseClassroom(classroom)" class="classroom-item cursor-pointer flex-column center" [title]="getClassroomEntitled(classroom)" *ngFor="let classroom of classroomsList;">
+      <h5>{{classroom.code}}</h5>
+      <div class="text-italic">
+        <span class="classroom-mini-info">{{getClassroomDescription(classroom.id)}}</span>
+        <span *ngIf="getClassroomGroupsNumber(classroom.id) > 0"> / {{'CLASSROOMSLIST.DIVIDED' | translate}} {{getClassroomGroupsNumber(classroom.id)}} {{'CLASSROOMSLIST.GROUPS' | translate}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="text-italic center no-result-found" *ngIf="classroomsList.length === 0">
+    {{'CLASSROOMSLIST.NORESULTFOUND' | translate}}
+  </div>
+</div>
+<div class="page-loader" *ngIf="hasLoadedDatas === null">
+  <i class="fa fa-refresh fa-pulse text-primary"></i>
+</div>
+<div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+  <img src="assets/images/loading-error.png"/>
+  <button class="btn btn-primary" (click)="loadClassrooms()">{{'CLASSROOMSLIST.RETRY' | translate}}</button>
+</div>
+
+<div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && classrooms.length === 0">
+  <img width="250px" height="250px" src="assets/images/required.jpg"/>
+  <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+</div>
+

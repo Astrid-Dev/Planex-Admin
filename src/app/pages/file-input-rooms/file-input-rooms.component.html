@@ -1,0 +1,34 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true">
+            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile()">
+              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
+            </div>
+
+            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile()">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
+
+              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            </div>
+          </div>
+          <div class="page-loader" *ngIf="hasLoadedDatas === null">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+            <img src="assets/images/loading-error2.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="loadDatas()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
