@@ -168,7 +168,6 @@ export class ClassroomsListComponent implements OnInit {
 
   onAllClassroomsClick()
   {
-    console.log("1")
     this.selectAllClassrooms.emit();
   }
 

@@ -10,7 +10,7 @@ import {Filiere} from "../../models/Filiere";
 })
 export class SectorsListComponent implements OnInit {
 
-  @Output("onSelectSector") selectedSector: EventEmitter<Filiere> = new EventEmitter();
+  @Output("onSelectSector") selectedSector: EventEmitter<{sector: Filiere, searchText: string | null}> = new EventEmitter();
   @Input("preferredSector") preferredSector: string | null = null;
   hasLoadedDatas: boolean | null = null;
   searchText: string = "";
@@ -83,7 +83,7 @@ export class SectorsListComponent implements OnInit {
 
   onChooseSector(sector: Filiere)
   {
-    this.selectedSector.emit(sector);
+    this.selectedSector.emit({sector: sector, searchText: this.searchText});
   }
 
   getTimeTypeDescription(timeTypeId: number|null|undefined)

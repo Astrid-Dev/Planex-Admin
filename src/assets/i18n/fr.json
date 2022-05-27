@@ -75,6 +75,7 @@
 	"FILESINPUT.FILEIMPORT.OR": "ou",
 	"FILESINPUT.FILEIMPORT.READINGFILEERROR": "Une erreur s'est produite lors de la lecture du fichier",
 	"FILESINPUT.FILEIMPORT.STATUS": "Statut",
+	"FILESINPUT.FILEIMPORT.SUCCESSIMPORT": "Le fichier a été importé avec succès !",
 	"FILESINPUT.FILEIMPORT.UNIMPORTED": "Aucun fichier importé pour l'instant",
 	"FILESINPUT.FILEIMPORT.UPLOADFILE": "Téléverser un fichier",
 	"FILESINPUT.FILEIMPORT.URLPLACEHOLDER": "Entrez l'url de vore fichier ici",

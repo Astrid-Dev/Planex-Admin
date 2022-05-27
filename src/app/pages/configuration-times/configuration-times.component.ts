@@ -24,6 +24,8 @@ export class ConfigurationTimesComponent implements OnInit, AfterViewInit {
   preferedSector: string | null = null;
   classroomOrigin: string | null = null;
 
+  showSectorsList: boolean = true;
+
   constructor(
     private translationService: TranslationService,
     private facultyService: FacultyService,
@@ -56,15 +58,22 @@ export class ConfigurationTimesComponent implements OnInit, AfterViewInit {
     this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
-  onSelectSector(sector: Filiere)
+  onSelectSector(result: {sector: Filiere, searchText: string | null})
   {
-    this.selectedSector = sector;
-    this.modal.setData(sector, true);
+    this.selectedSector = result.sector;
+    this.preferedSector = result.searchText;
+    this.modal.setData(result.sector, true);
     this.modal.open();
   }
 
   onModifySector()
   {
+    this.showSectorsList = false;
+    setTimeout(() =>{
+      this.showSectorsList = true;
+    }, 1);
+    //this.showSectorsList = true;
+
     if(this.classroomOrigin !== null && this.selectedSector?.code === this.preferedSector)
     {
       this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {classroom: this.classroomOrigin}});

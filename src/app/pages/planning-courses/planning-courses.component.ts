@@ -46,13 +46,14 @@ export class PlanningCoursesComponent implements OnInit {
         {
           if(this.route.snapshot.queryParamMap.get("classroom"))
           {
+            this.hasSelectedGlobalPlanning = false;
             this.selectedClassroomCode = this.route.snapshot.queryParamMap.get("classroom");
             this.hasSelectedClassroom = true;
-            this.hasSelectedGlobalPlanning = false;
             this.verifyClassroomCode();
           }
           else
           {
+            this.hasSelectedClassroom = false;
             if(this.route.snapshot.queryParamMap.get("filter"))
             {
               this.filterParam = this.route.snapshot.queryParamMap.get("filter");
@@ -63,7 +64,6 @@ export class PlanningCoursesComponent implements OnInit {
             {
               this.hasSelectedGlobalPlanning = false;
             }
-            this.hasSelectedClassroom = false;
           }
         }
       });
@@ -141,6 +141,11 @@ export class PlanningCoursesComponent implements OnInit {
     );
   }
 
+  get canShowClassroomsList()
+  {
+    return (this.hasLoadedDatasWithSuccess && !(this.hasSelectedClassroom || this.hasSelectedGlobalPlanning));
+  }
+
   get hasLoadedDatasWithError()
   {
     return (this.hasLoadedClassrooms === false && this.hasLoadedPlannings !== null) || (this.hasLoadedPlannings === false && this.hasLoadedClassrooms !== null);
@@ -161,6 +166,11 @@ export class PlanningCoursesComponent implements OnInit {
     return this.canDisplay && this.hasSelectedClassroom && this.timeTypeHasBeenConfigured;
   }
 
+  get canShowTimeTypeWarning()
+  {
+    return this.canDisplay && this.hasSelectedClassroom && !this.timeTypeHasBeenConfigured;
+  }
+
   get canShowMultiTimeTables()
   {
     return this.canDisplay && this.hasSelectedGlobalPlanning;
@@ -173,7 +183,6 @@ export class PlanningCoursesComponent implements OnInit {
 
   onSelectClassroom(classroom: Classe)
   {
-    //this.hasSelectedClassroom = true;
     this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {classroom: classroom.code}});
   }
 
@@ -219,8 +228,7 @@ export class PlanningCoursesComponent implements OnInit {
 
   get timeTypeHasBeenConfigured()
   {
-    let timeType = this.currentClassroom !== null ? this.facultyService.facultySectors.find(elt => elt.id === this.currentClassroom?.filiereId)?.typeHoraireId : null;
-
+    let timeType = ((this.currentClassroom !== null) ? (this.facultyService.facultySectors.find(elt => elt.id === this.currentClassroom?.filiereId)?.typeHoraireId) : null);
     return timeType !== null;
   }
 

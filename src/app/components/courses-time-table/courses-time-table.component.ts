@@ -19,7 +19,6 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
 
   @Input("classroom") classroomCode: string | null = null;
   @Input("readOnly") readOnly: boolean = true;
-  @Output("onPlanningUpdated") updateEvent: EventEmitter<any> = new EventEmitter();
 
   plannings: PlanningCours[] = [];
   isFirstTimePlanning: boolean = false;
@@ -111,8 +110,7 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
     if(this.periods && this.days)
     {
       let classroomId: any = this.classroom.infos?.id;
-      let academicYearId: any = this.faculty.anneeScolaireId
-      console.log(this.planningCoursesService.getMaxPlanningId() + result.length + 1)
+      let academicYearId: any = this.faculty.anneeScolaireId;
       this.periods.forEach((period: any) =>{
         this.days.forEach((day) =>{
           let dayId: any = day.id;
@@ -190,9 +188,10 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
     return this.facultyService.getAClassroomStudentsNumber(classroomId);
   }
 
-  getTeachingUnitCode(ueId: any)
+  getTeachingUnitCode(teachingUnitId: any)
   {
-    return ueId === null ? null : this.teachingUnits.find(ue => ue.id === ueId)?.code;
+    let teachingUnit = this.teachingUnits.find(ue => ue.id === teachingUnitId);
+    return teachingUnitId === null ? null : ((teachingUnit?.est_optionnelle ? '*' : '') + teachingUnit?.code);
   }
 
   getTeacherName(teacherId: any)
@@ -381,8 +380,6 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
       text: this.translationService.getValueOf("COURSESTIMETABLE.SUCCESS1")+ " "+ this.classroomCode + " "+this.translationService.getValueOf("COURSESTIMETABLE.SUCCESS2"),
       icon: 'success',
       confirmButtonText: 'OK'
-    }).then(() =>{
-      this.updateEvent.emit();
     });
   }
 

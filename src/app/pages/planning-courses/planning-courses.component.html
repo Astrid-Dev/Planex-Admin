@@ -8,10 +8,10 @@
         <div class="card">
           <a class="fullscreen-icon" data-action="expand"><i class="ft-maximize"></i></a>
           <div class="card-body collapse in" *ngIf="hasLoadedDatasWithSuccess && canDisplay">
-            <app-classrooms-list [isForPlanning]="true" (onSelectGlobalPlanning)="onSelectAAllClassrooms()" (onSelectSectorPlanning)="onSelectSectorClassrooms($event)" (onSelectClassroom)="onSelectClassroom($event)" [list]="classrooms" *ngIf="!hasSelectedClassroom && !hasSelectedGlobalPlanning" [load]="false"></app-classrooms-list>
-            <app-courses-time-table [readOnly]="false" (onPlanningUpdated)="loadDatas()" [classroom]="selectedClassroomCode" *ngIf="canShowTimeTable"></app-courses-time-table>
+            <app-classrooms-list [isForPlanning]="true" (onSelectGlobalPlanning)="onSelectAAllClassrooms()" (onSelectSectorPlanning)="onSelectSectorClassrooms($event)" (onSelectClassroom)="onSelectClassroom($event)" [list]="classrooms" *ngIf="canShowClassroomsList" [load]="false"></app-classrooms-list>
+            <app-courses-time-table [readOnly]="false" [classroom]="selectedClassroomCode" *ngIf="canShowTimeTable"></app-courses-time-table>
             <app-multi-courses-time-table *ngIf="canShowMultiTimeTables" [filter]="filterResult"></app-multi-courses-time-table>
-            <div class="not-configured-time center flex-column" *ngIf="canShowTimeTable && !timeTypeHasBeenConfigured">
+            <div class="not-configured-time center flex-column" *ngIf="canShowTimeTypeWarning">
               <img width="200px" height="200px" src="assets/images/not-configured.png"/>
               <h6 class="text-italic mt-2">{{'LOADINGERROR.TIMETYPE' | translate}} {{currentSectorCode}}</h6>
               <button class="btn btn-primary" (click)="goToSectorConfigurationTime()">{{'SUBMITS.CONFIGURE' | translate}}</button>

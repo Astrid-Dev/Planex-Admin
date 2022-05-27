@@ -75,6 +75,7 @@
 	"FILESINPUT.FILEIMPORT.OR": "or",
 	"FILESINPUT.FILEIMPORT.READINGFILEERROR": "An error occurred while reading the file",
 	"FILESINPUT.FILEIMPORT.STATUS": "Status",
+	"FILESINPUT.FILEIMPORT.SUCCESSIMPORT": "The file was successfully imported!",
 	"FILESINPUT.FILEIMPORT.UNIMPORTED": "No imported files for the moment",
 	"FILESINPUT.FILEIMPORT.UPLOADFILE": "Upload a file",
 	"FILESINPUT.FILEIMPORT.URLPLACEHOLDER": "Enter your file url here",

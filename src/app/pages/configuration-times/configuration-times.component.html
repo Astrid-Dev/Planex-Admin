@@ -7,7 +7,7 @@
       <div class="col-lg-12 col-md-12 col-xs-12">
         <div class="card">
           <div class="card-body collapse in">
-            <app-sectors-list [preferredSector]="preferedSector" (onSelectSector)="onSelectSector($event)"></app-sectors-list>
+            <app-sectors-list *ngIf="showSectorsList" [preferredSector]="preferedSector" (onSelectSector)="onSelectSector($event)"></app-sectors-list>
             <app-modal-sectior-time-selection (OnApplyModification)="onModifySector()"></app-modal-sectior-time-selection>
           </div>
         </div>

@@ -212,7 +212,7 @@ export class FileInputClassroomsComponent implements OnInit {
         this.facultyService.setFacultyClassrooms(classrooms);
         this.isImporting = false;
         Swal.fire({
-          title: this.translationService.getValueOf("ALERT.SUCCES"),
+          title: this.translationService.getValueOf("ALERT.SUCCESS"),
           text: this.translationService.getValueOf("FILESINPUT.FILEIMPORT.SUCCESSIMPORT"),
           icon: 'success',
           confirmButtonText: 'OK'

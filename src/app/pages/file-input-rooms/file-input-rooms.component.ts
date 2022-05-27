@@ -92,8 +92,8 @@ export class FileInputRoomsComponent implements OnInit {
         this.facultyService.setFacultyRooms(rooms);
         this.isImporting = false;
         Swal.fire({
-          title: this.translationService.getValueOf("ALERT.SUCCES"),
-          text: this.translationService.getValueOf("FILESINPUT.FILEIMPORT.SUCCESSIMPORT"),
+            title: this.translationService.getValueOf("ALERT.SUCCESS"),
+            text: this.translationService.getValueOf("FILESINPUT.FILEIMPORT.SUCCESSIMPORT"),
           icon: 'success',
           confirmButtonText: 'OK'
         });
