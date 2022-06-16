@@ -23,7 +23,7 @@ export class RoomsService {
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
-        if(numberOfLines !== 6 && numberOfLines !== 7)
+        if(numberOfLines !== 7 && numberOfLines !== 8)
         {
           reject("Fichier non conforme");
         }
@@ -37,7 +37,7 @@ export class RoomsService {
 
             let j = 0;
 
-            if(numberOfLines === 7)
+            if(numberOfLines === 8)
             {
               ++j;
             }
@@ -49,6 +49,7 @@ export class RoomsService {
             const capacite = parseInt(line[j+3].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim());
             const capacite_barr = parseInt(line[j+4].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim());
             const capacite_exam = parseInt(line[j+5].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim());
+            const etat = line[j+6].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
 
             const newSalle:Salle = {
               id: i,
@@ -58,7 +59,8 @@ export class RoomsService {
               capacite: capacite,
               capacite_barr: capacite_barr,
               capacite_exam: capacite_exam,
-              faculteId: facultyId
+              faculteId: facultyId,
+              etat: etat
             }
 
             result.push(newSalle);

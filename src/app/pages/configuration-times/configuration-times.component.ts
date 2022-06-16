@@ -76,7 +76,7 @@ export class ConfigurationTimesComponent implements OnInit, AfterViewInit {
 
     if(this.classroomOrigin !== null && this.selectedSector?.code === this.preferedSector)
     {
-      this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {classroom: this.classroomOrigin}});
+      this.router.navigate(["plannings/courses"], {queryParams: {classroom: this.classroomOrigin}});
     }
   }
 

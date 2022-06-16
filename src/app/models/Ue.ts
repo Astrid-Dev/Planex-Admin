@@ -1,5 +1,6 @@
 import {Classe} from "./Classe";
 import {Td} from "./Td";
+import {Domaine} from "./Domaine";
 
 export interface Ue {
   id?: number,
@@ -15,4 +16,8 @@ export interface Ue {
   defaultClasse?: string,
   createdAt?: string,
   updatedAt?: string,
+  domaine?: Domaine | string,
+  domaineId?: number | null,
+  defaultDomaine?: string,
+  quota_horaire?: number
 }

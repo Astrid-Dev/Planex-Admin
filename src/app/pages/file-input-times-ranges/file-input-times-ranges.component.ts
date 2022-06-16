@@ -1,21 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
-import Swal from "sweetalert2";
-import {SectorsService} from "../../services/sectors.service";
-import {Filiere} from "../../models/Filiere";
 import {FacultyService} from "../../services/faculty.service";
+import Swal from "sweetalert2";
+import {Periode, TypeHoraire} from "../../models/TypeHoraire";
+import {TimesRangesService} from "../../services/times-ranges.service";
 
 @Component({
-  selector: 'app-file-input-sectors',
-  templateUrl: './file-input-sectors.component.html',
-  styleUrls: ['./file-input-sectors.component.scss']
+  selector: 'app-file-input-times-ranges',
+  templateUrl: './file-input-times-ranges.component.html',
+  styleUrls: ['./file-input-times-ranges.component.scss']
 })
-export class FileInputSectorsComponent implements OnInit {
+export class FileInputTimesRangesComponent implements OnInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
-  sectors: Filiere[] = [];
+  periods: Periode[] = [];
 
   hasLoadedDatas: boolean | null = null;
   isImporting: boolean = false;
@@ -26,7 +26,7 @@ export class FileInputSectorsComponent implements OnInit {
 
   constructor(
     private translationService: TranslationService,
-    private sectorsService: SectorsService,
+    private timesRangesService: TimesRangesService,
     private facultyService: FacultyService
   ) { }
 
@@ -34,15 +34,15 @@ export class FileInputSectorsComponent implements OnInit {
 
     this.loadDatas();
 
-    this.pageTitle = "FILESINPUT.SECTORS.TITLE"
+    this.pageTitle = "FILESINPUT.TIMES.TITLE"
     this.breadcumbs.push(
       {
         linkName: "SIDEMENU.INPUTFILES.TITLE",
         link: "files-input"
       },
       {
-        linkName: "SIDEMENU.INPUTFILES.SECTORS",
-        link: "files-input/sectors"
+        linkName: "SIDEMENU.INPUTFILES.TIMES",
+        link: "files-input/levels"
       }
     )
   }
@@ -69,11 +69,11 @@ export class FileInputSectorsComponent implements OnInit {
 
   readFileContent(resultString: string)
   {
-    this.sectorsService.extractDataFromFile(resultString)
-      .then((sectors) =>{
-        this.sectors = sectors;
-        this.sendSectors();
-        console.log(sectors);
+    this.timesRangesService.extractDataFromFile(resultString)
+      .then((periods) =>{
+        console.log(periods)
+        this.periods = periods;
+        this.sendTimes();
       })
       .catch((err) =>{
         console.error(err);
@@ -87,12 +87,27 @@ export class FileInputSectorsComponent implements OnInit {
       })
   }
 
-  sendSectors()
+  sendTimes()
   {
     this.isImporting = true;
-    this.sectorsService.createSectors(this.sectors)
-      .then((sectors: Filiere[] | any) =>{
-        this.facultyService.setFacultySectors(sectors);
+    let pauseDuration = 0;
+
+    this.periods.forEach((period, index) =>{
+      pauseDuration += parseInt(period.debut.split("h")[0]);
+    });
+
+    if(this.periods.length > 0)
+    {
+      pauseDuration = Math.ceil(pauseDuration / this.periods.length);
+    }
+    let timeType: TypeHoraire = {
+      periodes: this.periods,
+      pause: pauseDuration,
+      faculteId: this.facultyService.currentFaculty.id
+    }
+    this.timesRangesService.createTimeType(timeType)
+      .then((result: TypeHoraire[] | any) =>{
+        this.facultyService.setFacultyTimesType(result);
         this.showImportedStatus = true;
         this.showDataList = false;
         this.showFileImport = false;
@@ -117,7 +132,7 @@ export class FileInputSectorsComponent implements OnInit {
   }
 
   get hasAlreadyUploadedData(){
-    let result = (this.hasLoadedDatas && this.facultyService.facultySectors.length > 0);
+    let result = (this.hasLoadedDatas && this.facultyService.facultyTimesTypes.length > 0);
 
     if(result && (!this.showDataList && !this.showFileImport))
     {

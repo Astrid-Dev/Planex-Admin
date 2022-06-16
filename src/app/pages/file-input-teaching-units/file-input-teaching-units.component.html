@@ -6,17 +6,24 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-xs-12">
         <div class="card">
-          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true && canUploadFile !== null">
-            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile">
-              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true">
+            <div class="card-block" *ngIf="canUploadFile && !hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{(hasAlreadyUploadedData ? 'FILESINPUT.FILEIMPORT.IMPORTED' : 'FILESINPUT.FILEIMPORT.UNIMPORTED') | translate}}</mark></h5>
+              <div class="center flex-column" *ngIf="canShowImportedStatus">
+                <img src="assets/images/saved-data.jpg"/>
+                <div class="mt-2">
+                  <button class="btn btn-outline-amber mr-2">Consulter</button>
+                  <button class="btn btn-outline-danger">Complémenter</button>
+                </div>
+              </div>
+
+              <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
             </div>
 
-            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile && !hasFoundBadsDatas">
-              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
-
-              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            <div class="required-file-importation center flex-column" *ngIf="!canUploadFile">
+              <img width="250px" height="250px" src="assets/images/required.jpg"/>
+              <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
             </div>
-
             <div class="card-block" *ngIf="hasFoundBadsDatas">
               <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.INCOHERENTDATASLIST' | translate}}</h5>
 
@@ -31,6 +38,8 @@
                     <th>{{'FILESINPUT.TEACHINGUNITS.ISOPTIONAL' | translate}}</th>
                     <th>{{'FILESINPUT.TEACHINGUNITS.HASTUTORIAL' | translate}}</th>
                     <th>{{'FILESINPUT.TEACHINGUNITS.CLASSROOM' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.DOMAIN' | translate}}</th>
+                    <th>{{'FILESINPUT.TEACHINGUNITS.HOURS' | translate}}</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -41,7 +50,7 @@
                     <td class="width-200">{{teachingUnit.semestre}}</td>
                     <td class="width-200">{{getBooleanText(teachingUnit.est_optionnelle)}}</td>
                     <td class="width-200">{{getBooleanText(teachingUnit.possede_td)}}</td>
-                    <td class="width-200">
+                    <td class="width-200" *ngIf="teachingUnit.classeId === null">
                       <select [(ngModel)]="teachingUnit.classe" class="select2-theme form-control" >
                         <optgroup [label]="'FILESINPUT.TEACHINGUNITS.DEFAULTVALUE' | translate">
                           <option [value]="teachingUnit.defaultClasse">{{teachingUnit.defaultClasse}}</option>
@@ -51,6 +60,19 @@
                         </optgroup>
                       </select>
                     </td>
+                    <td class="width-200" *ngIf="teachingUnit.classeId !== null">{{teachingUnit.classe}}</td>
+                    <td class="width-200" *ngIf="teachingUnit.domaineId === null">
+                      <select [(ngModel)]="teachingUnit.domaine" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.TEACHINGUNITS.DEFAULTVALUE' | translate">
+                          <option [value]="teachingUnit.defaultDomaine">{{teachingUnit.defaultDomaine}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.TEACHINGUNITS.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let domain of domains" [value]="domain.nom">{{domain.nom}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="teachingUnit.domaineId !== null">{{teachingUnit.domaine}}</td>
+                    <td class="width-200">{{teachingUnit.quota_horaire}}</td>
                   </tr>
                   </tbody>
                 </table>
@@ -60,10 +82,6 @@
                 </div>
               </div>
             </div>
-          </div>
-          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && canUploadFile === null">
-            <img width="250px" height="250px" src="assets/images/required.jpg"/>
-            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
           </div>
           <div class="page-loader" *ngIf="hasLoadedDatas === null">
             <i class="fa fa-refresh fa-pulse text-primary"></i>

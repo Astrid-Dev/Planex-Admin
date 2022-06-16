@@ -25,6 +25,10 @@ export class FileInputClassroomsComponent implements OnInit {
 
   hasFoundBadsDatas: boolean = false;
 
+  showDataList: boolean = false;
+  showFileImport: boolean = false;
+  showImportedStatus: boolean = false;
+
   constructor(
     private translationService: TranslationService,
     private classroomsService: ClassroomsService,
@@ -139,15 +143,15 @@ export class FileInputClassroomsComponent implements OnInit {
     });
 
     this.badsClassrooms.forEach((classroom) =>{
-      let sectors = this.getSectors().filter((a) => {return a.code === classroom.filiere});
-      let levels = this.getLevels().filter((a) =>{return a.code === classroom.niveau});
+      let sector = this.getSectors().find((a) => {return a.code === classroom.filiere});
+      let level = this.getLevels().find((a) =>{return a.code === classroom.niveau});
 
-      if(sectors.length > 0 && levels.length > 0)
+      if(sector && level)
       {
         let temp: Classe = {
           ...classroom,
-          filiereId: sectors[0].id,
-          niveauId: levels[0].id
+          filiereId: sector.id,
+          niveauId: level.id
         }
 
         deleteProperty(temp, "filiere");
@@ -159,8 +163,8 @@ export class FileInputClassroomsComponent implements OnInit {
       {
         let temp: Classe = {
           ...classroom,
-          filiereId: sectors.length > 0 ? sectors[0].id: null,
-          niveauId: levels.length > 0 ? levels[0].id : null
+          filiereId: sector ? sector.id: null,
+          niveauId: level ? level.id : null
         }
 
         if(temp.filiereId === null)
@@ -210,6 +214,9 @@ export class FileInputClassroomsComponent implements OnInit {
     this.classroomsService.createClassrooms(this.classrooms)
       .then((classrooms: Classe[] | any) =>{
         this.facultyService.setFacultyClassrooms(classrooms);
+        this.showImportedStatus = true;
+        this.showDataList = false;
+        this.showFileImport = false;
         this.isImporting = false;
         Swal.fire({
           title: this.translationService.getValueOf("ALERT.SUCCESS"),
@@ -230,15 +237,39 @@ export class FileInputClassroomsComponent implements OnInit {
       })
   }
 
+  get hasAlreadyUploadedData(){
+    let result = (this.hasLoadedDatas && this.facultyService.facultyClassrooms.length > 0);
+
+    if(result && (!this.showDataList && !this.showFileImport))
+    {
+      this.showImportedStatus = true;
+    }
+
+    if(this.hasLoadedDatas && !this.showDataList && !this.showFileImport && !this.showImportedStatus)
+    {
+      this.showFileImport = true;
+    }
+
+    return result;
+  }
+
+  get canShowFileImport(){
+    return ((this.hasLoadedDatas && this.showFileImport));
+  }
+
+  get canShowDataList(){
+    return ((this.hasLoadedDatas) && (this.showDataList));
+  }
+
+  get canShowImportedStatus()
+  {
+    return this.hasLoadedDatas && this.showImportedStatus;
+  }
+
   get canUploadFile()
   {
-    if(this.facultyService.facultySectors.length === 0 || this.facultyService.facultyLevels.length === 0)
-    {
-      return null;
-    }
-    else{
-      return this.facultyService.facultyClassrooms.length === 0;
-    }
+    return ((this.hasLoadedDatas) && (this.facultyService.facultySectors.length > 0 && this.facultyService.facultyLevels.length > 0));
+
   }
 
   getSectors()

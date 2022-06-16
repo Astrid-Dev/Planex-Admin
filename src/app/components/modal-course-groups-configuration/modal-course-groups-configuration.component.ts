@@ -115,10 +115,10 @@ export class ModalCourseGroupsConfigurationComponent implements OnInit, AfterVie
       hasUpdatedGroupsLetters = true;
     }
 
-    for(let i = 0; i < this.groups.length; i++)
-    {
-
-    }
+    // for(let i = 0; i < this.groups.length; i++)
+    // {
+    //
+    // }
 
     if((hasDivided && this.classroom.est_divisee !== 2) || (!hasDivided && this.classroom.est_divisee !== 1) || (hasUpdatedGroupsLetters))
     {
@@ -147,7 +147,7 @@ export class ModalCourseGroupsConfigurationComponent implements OnInit, AfterVie
       }
       else
       {
-        if(this.classroom.classroom === 2)
+        if(this.classroom.est_divisee === 2)
         {
           this.courseGroupsService.deleteGroupsForOneClassroom(this.classroom.id)
             .then((res) =>{

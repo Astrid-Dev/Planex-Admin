@@ -27,60 +27,77 @@ export class SidemenuComponent implements OnInit {
               this.current_menu = 1;
               break;
             }
-            case "/files-input/teachers" :{
+            case "/files-input/domains" :{
               this.current_menu = 2;
               break;
             }
-            case "/files-input/rooms" :{
+            case "/files-input/times-ranges" :{
               this.current_menu = 3;
               break;
             }
-            case "/files-input/sectors" :{
+            case "/files-input/teachers" :{
               this.current_menu = 4;
               break;
             }
-            case "/files-input/levels" :{
+            case "/files-input/rooms" :{
               this.current_menu = 5;
               break;
             }
-            case "/files-input/classrooms" :{
+            case "/files-input/sectors" :{
               this.current_menu = 6;
               break;
             }
-            case "/files-input/teaching-units" :{
+            case "/files-input/levels" :{
               this.current_menu = 7;
               break;
             }
-            case "/files-input/students" :{
+            case "/files-input/classrooms" :{
               this.current_menu = 8;
               break;
             }
-            case "/configurations" :{
+            case "/files-input/teaching-units" :{
               this.current_menu = 9;
               break;
             }
-            case "/configurations/times" :{
+            case "/files-input/students" :{
               this.current_menu = 10;
               break;
             }
-            case "/configurations/courses-groups" :{
+            case "/configurations" :{
               this.current_menu = 11;
               break;
             }
-            case "/plannings" :{
+            case "/configurations/times" :{
               this.current_menu = 12;
               break;
             }
-            case "/plannings/courses-and-tutorials" :{
+            case "/configurations/courses-groups" :{
               this.current_menu = 13;
+              break;
+            }
+            case "/plannings" :{
+              this.current_menu = 14;
+              break;
+            }
+            case "/plannings/courses" :{
+              this.current_menu = 15;
+              break;
+            }
+            case "/plannings/tutorials" :{
+              this.current_menu = 16;
               break;
             }
 
           }
 
-          if(url.includes("/plannings/courses-and-tutorials"))
+          if(url.includes("/plannings/courses"))
           {
-            this.current_menu = 13;
+            this.current_menu = 15;
+          }
+
+          if(url.includes("/plannings/tutorials"))
+          {
+            this.current_menu = 16;
           }
         }
       });

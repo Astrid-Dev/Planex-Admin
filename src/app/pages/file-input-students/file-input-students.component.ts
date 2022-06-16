@@ -3,11 +3,8 @@ import {Breadcumb} from "../../components/page-header-row/page-header-row.compon
 import {TranslationService} from "../../services/translation.service";
 import {DonneeEtudiant, Etudiant} from "../../models/Etudiant";
 import {FacultyService, letters} from "../../services/faculty.service";
-import {TeachingUnitsService} from "../../services/teaching-units.service";
-import {TutorialsService} from "../../services/tutorials.service";
 import {StudentsService} from "../../services/students.service";
 import Swal from "sweetalert2";
-import {Ue} from "../../models/Ue";
 import deleteProperty = Reflect.deleteProperty;
 
 @Component({
@@ -28,6 +25,10 @@ export class FileInputStudentsComponent implements OnInit {
   isImporting: boolean = false;
 
   hasFoundBadsDatas: boolean = false;
+
+  showDataList: boolean = false;
+  showFileImport: boolean = false;
+  showImportedStatus: boolean = false;
 
   constructor(
     private translationService: TranslationService,
@@ -186,7 +187,10 @@ export class FileInputStudentsComponent implements OnInit {
     this.isImporting = true;
     this.studentsService.createStudents(this.students)
       .then((students: Etudiant[] | any) =>{
-        this.facultyService.setStudentsDatas(this.studentsDatasToSend, this.students.length)
+        this.facultyService.setStudentsDatas(this.studentsDatasToSend, this.students.length);
+        this.showImportedStatus = true;
+        this.showDataList = false;
+        this.showFileImport = false;
         this.isImporting = false;
         Swal.fire({
           title: this.translationService.getValueOf("ALERT.SUCCESS"),
@@ -220,15 +224,40 @@ export class FileInputStudentsComponent implements OnInit {
     })
   }
 
+  get hasAlreadyUploadedData(){
+    let result = (this.hasLoadedDatas && this.facultyService.hasUploadStudents());
+
+    if(result && (!this.showDataList && !this.showFileImport))
+    {
+      this.showImportedStatus = true;
+      this.showFileImport = false;
+      this.showDataList = false;
+    }
+
+    if(this.hasLoadedDatas && !this.showDataList && !this.showFileImport && !this.showImportedStatus)
+    {
+      this.showFileImport = true;
+    }
+
+    return result;
+  }
+
+  get canShowFileImport(){
+    return ((this.hasLoadedDatas && this.showFileImport));
+  }
+
+  get canShowDataList(){
+    return ((this.hasLoadedDatas) && (this.showDataList));
+  }
+
+  get canShowImportedStatus()
+  {
+    return this.hasLoadedDatas && this.showImportedStatus;
+  }
+
   get canUploadFile()
   {
-    if(this.facultyService.facultyClassrooms.length === 0)
-    {
-      return null;
-    }
-    else{
-      return this.facultyService.canUploadStudentsFile();
-    }
+    return (this.facultyService.facultyClassrooms.length > 0)
   }
 
   getClassrooms(){

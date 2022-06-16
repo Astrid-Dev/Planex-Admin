@@ -7,14 +7,17 @@
       <div class="col-lg-12 col-md-12 col-xs-12">
         <div class="card">
           <div class="card-body collapse in" *ngIf="hasLoadedDatas === true">
-            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile()">
-              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
-            </div>
 
-            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile()">
-              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
-
-              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            <div class="card-block">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{(hasAlreadyUploadedData ? 'FILESINPUT.FILEIMPORT.IMPORTED' : 'FILESINPUT.FILEIMPORT.UNIMPORTED') | translate}}</mark></h5>
+              <div class="center flex-column" *ngIf="canShowImportedStatus">
+                <img src="assets/images/saved-data.jpg"/>
+                <div class="mt-2">
+                  <button class="btn btn-outline-amber mr-2">Consulter</button>
+                  <button class="btn btn-outline-danger">Complémenter</button>
+                </div>
+              </div>
+              <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
             </div>
           </div>
           <div class="page-loader" *ngIf="hasLoadedDatas === null">
@@ -28,7 +31,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 

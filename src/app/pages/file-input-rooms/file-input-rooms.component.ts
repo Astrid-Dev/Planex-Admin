@@ -5,7 +5,6 @@ import Swal from "sweetalert2";
 import {Salle} from "../../models/Salle";
 import {RoomsService} from "../../services/rooms.service";
 import {FacultyService} from "../../services/faculty.service";
-import {Niveau} from "../../models/Niveau";
 
 @Component({
   selector: 'app-file-input-rooms',
@@ -20,6 +19,10 @@ export class FileInputRoomsComponent implements OnInit {
 
   hasLoadedDatas: boolean | null = null;
   isImporting: boolean = false;
+
+  showDataList: boolean = false;
+  showFileImport: boolean = false;
+  showImportedStatus: boolean = false;
 
   constructor(
     private translationService: TranslationService,
@@ -90,6 +93,9 @@ export class FileInputRoomsComponent implements OnInit {
     this.roomsService.createRooms(this.rooms)
       .then((rooms: Salle[] | any) =>{
         this.facultyService.setFacultyRooms(rooms);
+        this.showImportedStatus = true;
+        this.showDataList = false;
+        this.showFileImport = false;
         this.isImporting = false;
         Swal.fire({
             title: this.translationService.getValueOf("ALERT.SUCCESS"),
@@ -110,9 +116,35 @@ export class FileInputRoomsComponent implements OnInit {
       })
   }
 
-  canUploadFile()
+  get hasAlreadyUploadedData(){
+    let result = (this.hasLoadedDatas && this.facultyService.facultyRooms.length > 0);
+
+    if(result && (!this.showDataList && !this.showFileImport))
+    {
+      this.showImportedStatus = true;
+      this.showFileImport = false;
+      this.showDataList = false;
+    }
+
+    if(this.hasLoadedDatas && !this.showDataList && !this.showFileImport && !this.showImportedStatus)
+    {
+      this.showFileImport = true;
+    }
+
+    return result;
+  }
+
+  get canShowFileImport(){
+    return ((this.hasLoadedDatas && this.showFileImport));
+  }
+
+  get canShowDataList(){
+    return ((this.hasLoadedDatas) && (this.showDataList));
+  }
+
+  get canShowImportedStatus()
   {
-    return this.facultyService.facultyRooms.length === 0;
+    return this.hasLoadedDatas && this.showImportedStatus;
   }
 
 }

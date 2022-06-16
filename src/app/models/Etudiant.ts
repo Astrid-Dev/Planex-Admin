@@ -4,6 +4,7 @@ export interface Etudiant {
   id?: number,
   noms: string,
   matricule: string,
+  sexe?: number,
   email: string,
   classe: string | Classe,
   classeId?: number | null,

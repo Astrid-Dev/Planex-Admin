@@ -183,7 +183,7 @@ export class PlanningCoursesComponent implements OnInit {
 
   onSelectClassroom(classroom: Classe)
   {
-    this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {classroom: classroom.code}});
+    this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
   }
 
   verifyClassroomCode()
@@ -251,12 +251,12 @@ export class PlanningCoursesComponent implements OnInit {
 
   onSelectAAllClassrooms()
   {
-    this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {filter: "all"}});
+    this.router.navigate(["plannings/courses"], {queryParams: {filter: "all"}});
   }
 
   onSelectSectorClassrooms(sector: Filiere)
   {
-    this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {filter: sector.code}});
+    this.router.navigate(["plannings/courses"], {queryParams: {filter: sector.code}});
   }
 
 }

@@ -23,7 +23,7 @@ export class StudentsService {
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
-        if(numberOfLines !== 4 && numberOfLines !== 5)
+        if(numberOfLines !== 5 && numberOfLines !== 6)
         {
           reject("Fichier non conforme");
         }
@@ -37,20 +37,25 @@ export class StudentsService {
 
             let j = 0;
 
-            if(numberOfLines === 5)
+            if(numberOfLines === 6)
             {
               ++j;
             }
 
+            const MEN = ["HOMME", "MAN", "MASCULIN", "MALE", "GARCON", "BOY"];
+            const WOMEN = ["FEMME", "WOMAN", "FEMININ", "FEMALE", "FILLE", "GIRL"];
+
             const noms = line[j].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
             const matricule = line[j+1].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
-            const email = line[j+2].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-            const classe = line[j+3].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
+            const sexe = line[j+2].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
+            const email = line[j+3].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const classe = line[j+4].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
 
             const newEtudiant:Etudiant = {
               id: i,
               matricule: matricule,
               noms: noms ,
+              sexe: MEN.includes(sexe) ? 1 : WOMEN.includes(sexe) ? 2 : 1,
               email: email,
               classe: classe,
             }

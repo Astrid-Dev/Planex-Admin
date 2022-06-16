@@ -15,6 +15,8 @@ import {ConfigurationCoursesGroupsComponent} from "./pages/configuration-courses
 import {ConfigurationsComponent} from "./pages/configurations/configurations.component";
 import {PlanningCoursesComponent} from "./pages/planning-courses/planning-courses.component";
 import {PlanningsComponent} from "./pages/plannings/plannings.component";
+import {FileInputTimesRangesComponent} from "./pages/file-input-times-ranges/file-input-times-ranges.component";
+import {FileInputDomainsComponent} from "./pages/file-input-domains/file-input-domains.component";
 
 const routes: Routes = [
   {
@@ -66,6 +68,14 @@ const routes: Routes = [
         component: FileInputTeachingUnitsComponent
       },
       {
+        path: "times-ranges",
+        component: FileInputTimesRangesComponent
+      },
+      {
+        path: "domains",
+        component: FileInputDomainsComponent
+      },
+      {
         path: "**",
         redirectTo: "page-not-found"
       }
@@ -100,7 +110,7 @@ const routes: Routes = [
         component: PlanningsComponent
       },
       {
-        path: 'courses-and-tutorials',
+        path: 'courses',
         component: PlanningCoursesComponent
       },
       {

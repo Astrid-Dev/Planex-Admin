@@ -7,6 +7,7 @@ import {NgxSmartModalService} from "ngx-smart-modal";
 import Swal from "sweetalert2";
 import { jsPDF } from "jspdf";
 import html2canvas from 'html2canvas';
+import {GeneratePlanningParameter} from "../../models/GeneratePlanningParameter";
 
 const MODAL_ID = "coursesPlanningModal";
 
@@ -54,7 +55,24 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
     let classroomId: any = this.classroom.infos?.id;
     let predefinedPlannings: PlanningCours[] = this.planningCoursesService.getPlanningOfOneClassroom(classroomId);
     this.isFirstTimePlanning = predefinedPlannings.length === 0;
-    this.plannings = predefinedPlannings.length > 0 ? predefinedPlannings : this.defaultPlanning;
+    console.log(this.classroom);
+    let classroom: any = this.classroom.infos;
+    let temp: GeneratePlanningParameter = {
+      coursesGroups: this.coursesGroups,
+      classroom: classroom,
+      classroomStudentsNumber: this.studentsNumber,
+      teachersDomains: this.facultyService.facultyTeachersDomains,
+      teachingUnits: this.teachingUnits,
+      academicYearId: this.facultyService.currentFaculty.anneeScolaireId,
+      allPeriods: this.facultyService.allPeriods,
+      days: this.facultyService.allDays,
+      domains: this.facultyService.facultyDomains,
+      periods: this.periods,
+      rooms: this.rooms,
+      teachers: this.teachers
+    }
+    let generatedPlanning = this.planningCoursesService.generateAClassroomCoursesPlanning(temp);
+    this.plannings = predefinedPlannings.length > 0 ? predefinedPlannings : generatedPlanning.length > 0 ? generatedPlanning : this.defaultPlanning;
   }
 
   get faculty(){
@@ -98,14 +116,16 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
   get days()
   {
     return this.facultyService.allDays
-      .filter((day, index) =>{return day.numero !== 0})
       .sort((a, b) => {
-      return a.numero - b.numero
+        let numero1 = a.numero === 0 ? 100 : a.numero;
+        let numero2 = b.numero === 0 ? 100 : b.numero;
+      return numero1 - numero2
     });
   }
 
   get defaultPlanning()
   {
+
     let result: PlanningCours[] = [];
     if(this.periods && this.days)
     {

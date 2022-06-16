@@ -9,4 +9,5 @@ export interface Salle {
   faculteId: number,
   createdAt?: string,
   updatedAt?: string,
+  etat?: string
 }

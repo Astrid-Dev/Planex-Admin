@@ -13,6 +13,7 @@ import {Td} from "../models/Td";
 import {DonneeEtudiant} from "../models/Etudiant";
 import {GroupeCours} from "../models/GroupeCours";
 import {GroupeTd} from "../models/GroupeTd";
+import {Domaine, DomaineEnseignant} from "../models/Domaine";
 
 export const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
@@ -33,6 +34,8 @@ export class FacultyService {
   coursesGroups: GroupeCours[] = [];
   tutorialsGroups: GroupeTd[] = [];
   studentsDatas: DonneeEtudiant[] = [];
+  domains: Domaine[] = [];
+  teachersDomains: DomaineEnseignant[] = [];
   times: TypeHoraire[] = [];
   days: { numero: number, id?: number, intitule: string, intitule_en: string}[] = [];
   faculty !: Faculte;
@@ -63,6 +66,8 @@ export class FacultyService {
             this.tutorialsGroups = res.groupes_tds;
             this.facultyStats = res.donnees_fichiers;
             this.teachers = res.enseignants;
+            this.domains = res.domaines;
+            this.teachersDomains = res.domaines_enseignants;
             this.academicYear = res.annee_scolaire;
 
             this.attributeStudentsNumberToCoursesGroups();
@@ -106,16 +111,39 @@ export class FacultyService {
 
   get facultyTeachers()
   {
-    return this.teachers;
+    return this.teachers.sort((a, b) => a.noms.localeCompare(b.noms));
   }
   setFacultyTeachers(newTeachers: Enseignant[])
   {
     this.teachers = newTeachers;
   }
 
+  get facultyDomains(){
+    return this.domains.sort((a, b) => a.nom.toUpperCase().localeCompare(b.nom.toUpperCase()));
+  }
+
+  setFacultyDomains(newDomains: Domaine[])
+  {
+    this.domains = newDomains;
+  }
+
+  get facultyTeachersDomains()
+  {
+    return this.teachersDomains;
+  }
+
+  setFacultyTeachersDomains(newTeachersDomains: DomaineEnseignant[]){
+    this.teachersDomains = newTeachersDomains;
+  }
+
+  getADomainById(id: any){
+    let domain = this.domains.find(elt => elt.id === id);
+    return domain ? domain : null;
+  }
+
   get facultyTeachingUnits()
   {
-    return this.teachingUnits;
+    return this.teachingUnits.sort((a, b) => a.code.localeCompare(b.code));
   }
   setFacultyTeachingUnits(newTeachingUnits: Ue[])
   {
@@ -124,7 +152,7 @@ export class FacultyService {
 
   get facultyRooms()
   {
-    return this.rooms;
+    return this.rooms.sort((a, b) => a.code.toUpperCase().localeCompare(b.code.toUpperCase()));
   }
   setFacultyRooms(newRooms: Salle[])
   {
@@ -167,7 +195,7 @@ export class FacultyService {
     return this.days;
   }
 
-  get timesTypes()
+  get facultyTimes()
   {
     return this.times;
   }
@@ -209,9 +237,9 @@ export class FacultyService {
     this.studentsDatas = newStudentsDatas;
     this.facultyStats.etudiants = studentsNumber;
   }
-  canUploadStudentsFile()
+  hasUploadStudents()
   {
-    return this.facultyStats.etudiants === 0;
+    return this.facultyStats.etudiants > 0;
   }
 
   get hasLoaded()
@@ -335,6 +363,11 @@ export class FacultyService {
   get facultyTimesTypes()
   {
     return this.times;
+  }
+
+  setFacultyTimesType(newTimesType: TypeHoraire[])
+  {
+    this.times = newTimesType;
   }
 
   getAClassroomTutorials(classroomId: number)

@@ -3,6 +3,7 @@ import {NgxSmartModalComponent, NgxSmartModalService} from "ngx-smart-modal";
 import {PlanningCours} from "../../models/PlanningCours";
 import {TranslationService} from "../../services/translation.service";
 import {Classe} from "../../models/Classe";
+import {PlanningCoursesService} from "../../services/planning-courses.service";
 
 const MODAL_ID = "coursesPlanningModal";
 
@@ -75,7 +76,8 @@ export class ModalUpdatingCoursesPlanningComponent implements OnInit, AfterViewI
 
   constructor(
     private ngxSmartModalService: NgxSmartModalService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private planningCoursesService: PlanningCoursesService
   ) { }
 
   ngOnInit(): void {
@@ -230,61 +232,7 @@ export class ModalUpdatingCoursesPlanningComponent implements OnInit, AfterViewI
 
   timesAreConcurent(period1Id: any, period2Id: any)
   {
-    let result: boolean = false;
-    if(period1Id !== null && period2Id !== null)
-    {
-      if(period1Id === period2Id)
-      {
-        result = true;
-      }
-      else
-      {
-        let period1 = this.periods.find((elt: any) => elt.id === period1Id);
-        let period2 = this.periods.find((elt: any) => elt.id === period2Id);
-
-        if((typeof period1 !== "undefined" && typeof period2 !== "undefined"))
-        {
-          let startHour1 = parseInt(period1.debut.split("h")[0]);
-          let startHour2 = parseInt(period2.debut.split("h")[0]);
-          let endHour1 = parseInt(period1.fin.split("h")[0]);
-          let endHour2 = parseInt(period2.fin.split("h")[0]);
-          let startMin1 = parseInt(period1.debut.split("h")[1]);
-          let startMin2 = parseInt(period2.debut.split("h")[1]);
-          let endMin1 = parseInt(period1.fin.split("h")[1]);
-          let endMin2 = parseInt(period2.fin.split("h")[1]);
-
-          let currentDate = new Date();
-          currentDate.setHours(startHour1, startMin1);
-          let startTime1 = currentDate.getTime();
-
-          currentDate.setHours(startHour2, startMin2);
-          let startTime2 = currentDate.getTime();
-
-          currentDate.setHours(endHour1, endMin1);
-          let endTime1 = currentDate.getTime();
-
-          currentDate.setHours(endHour2, endMin2);
-          let endTime2 = currentDate.getTime();
-          if((startTime1 >= startTime2 && (endTime2 >= startTime1 && endTime1 >= endTime2)) || (startTime2 >= startTime1 && (endTime1 >= startTime2 && endTime2 >= endTime1)))
-          {
-            result = true;
-          }
-          else
-          {
-            result = false;
-          }
-        }
-        else
-        {
-          result = false;
-        }
-      }
-    }
-    else{
-      result = false;
-    }
-
-    return result;
+    return this.planningCoursesService.timesAreConcurent(this.periods, period1Id, period2Id);
   }
 
   get otherPlanningsAtThisTime()

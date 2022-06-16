@@ -20,6 +20,10 @@ export class FileInputLevelsComponent implements OnInit {
   hasLoadedDatas: boolean | null = null;
   isImporting: boolean = false;
 
+  showDataList: boolean = false;
+  showFileImport: boolean = false;
+  showImportedStatus: boolean = false;
+
   constructor(
     private translationService: TranslationService,
     private levelsService: LevelsService,
@@ -89,6 +93,9 @@ export class FileInputLevelsComponent implements OnInit {
     this.levelsService.createLevels(this.levels)
       .then((levels: Niveau[] | any) =>{
         this.facultyService.setFacultyLevels(levels);
+        this.showImportedStatus = true;
+        this.showDataList = false;
+        this.showFileImport = false;
         this.isImporting = false;
         Swal.fire({
           title: this.translationService.getValueOf("ALERT.SUCCESS"),
@@ -109,9 +116,34 @@ export class FileInputLevelsComponent implements OnInit {
       })
   }
 
-  canUploadFile()
-  {
-    return this.facultyService.facultyLevels.length === 0;
+  get hasAlreadyUploadedData(){
+    let result = (this.hasLoadedDatas && this.facultyService.facultyLevels.length > 0);
+
+    if(result && (!this.showDataList && !this.showFileImport))
+    {
+      this.showImportedStatus = true;
+      this.showFileImport = false;
+      this.showDataList = false;
+    }
+
+    if(this.hasLoadedDatas && !this.showDataList && !this.showFileImport && !this.showImportedStatus)
+    {
+      this.showFileImport = true;
+    }
+
+    return result;
   }
 
+  get canShowFileImport(){
+    return ((this.hasLoadedDatas && this.showFileImport));
+  }
+
+  get canShowDataList(){
+    return ((this.hasLoadedDatas) && (this.showDataList));
+  }
+
+  get canShowImportedStatus()
+  {
+    return this.hasLoadedDatas && this.showImportedStatus;
+  }
 }

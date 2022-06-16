@@ -6,15 +6,23 @@
     <div class="row">
       <div class="col-lg-12 col-md-12 col-xs-12">
         <div class="card">
-          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true && canUploadFile !== null">
-            <div class="card-block" *ngIf="hasLoadedDatas && !canUploadFile">
-              <h5 class="center">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.IMPORTED' | translate}}</mark></h5>
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true">
+            <div class="card-block" *ngIf="canUploadFile && !hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{(hasAlreadyUploadedData ? 'FILESINPUT.FILEIMPORT.IMPORTED' : 'FILESINPUT.FILEIMPORT.UNIMPORTED') | translate}}</mark></h5>
+              <div class="center flex-column" *ngIf="canShowImportedStatus">
+                <img src="assets/images/saved-data.jpg"/>
+                <div class="mt-2">
+                  <button class="btn btn-outline-amber mr-2">Consulter</button>
+                  <button class="btn btn-outline-danger">Complémenter</button>
+                </div>
+              </div>
+
+              <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
             </div>
 
-            <div class="card-block" *ngIf="hasLoadedDatas && canUploadFile && !hasFoundBadsDatas">
-              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{'FILESINPUT.FILEIMPORT.UNIMPORTED' | translate}}</mark></h5>
-
-              <app-file-import (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+            <div class="required-file-importation center flex-column" *ngIf="!canUploadFile">
+              <img width="250px" height="250px" src="assets/images/required.jpg"/>
+              <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
             </div>
 
             <div class="card-block" *ngIf="hasFoundBadsDatas">
@@ -26,6 +34,7 @@
                   <tr>
                     <th>{{'FILESINPUT.STUDENTS.NAME' | translate}}</th>
                     <th>{{'FILESINPUT.STUDENTS.REGISTRATION' | translate}}</th>
+                    <th>{{'FILESINPUT.STUDENTS.SEX' | translate}}</th>
                     <th>{{'FILESINPUT.STUDENTS.EMAIL' | translate}}</th>
                     <th>{{'FILESINPUT.STUDENTS.CLASSROOM' | translate}}</th>
                   </tr>
@@ -34,6 +43,7 @@
                   <tr *ngFor="let student of badStudents">
                     <td class="width-200">{{student.noms}}</td>
                     <td class="width-200">{{student.matricule}}</td>
+                    <td>{{(student.sexe === 2 ? 'FILESINPUT.STUDENTS.FEMALE' : 'FILESINPUT.STUDENTS.MALE') | translate}}</td>
                     <td class="width-200">{{student.email}}</td>
                     <td class="width-200">
                       <select [(ngModel)]="student.classe" class="select2-theme form-control" >
@@ -54,11 +64,6 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatas === true && canUploadFile === null">
-            <img width="250px" height="250px" src="assets/images/required.jpg"/>
-            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
           </div>
 
           <div class="page-loader" *ngIf="hasLoadedDatas === null">

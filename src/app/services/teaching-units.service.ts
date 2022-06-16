@@ -29,7 +29,7 @@ export class TeachingUnitsService {
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
-        if(numberOfLines !== 7 && numberOfLines !== 8)
+        if(numberOfLines !== 9 && numberOfLines !== 10)
         {
           reject("Fichier non conforme");
         }
@@ -43,7 +43,7 @@ export class TeachingUnitsService {
 
             let j = 0;
 
-            if(numberOfLines === 8)
+            if(numberOfLines === 10)
             {
               ++j;
             }
@@ -51,20 +51,24 @@ export class TeachingUnitsService {
             const code = line[j].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
             const intitule = line[j+1].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
             const intitule_en = line[j+2].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-            const est_optionnelle = line[j+3].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-            const possede_td = line[j+4].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-            const classe = line[j+5].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
-            const semestre = line[j+6].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const domaine = line[j+3].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const est_optionnelle = line[j+4].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const possede_td = line[j+5].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const classe = line[j+6].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim().toUpperCase();
+            const semestre = line[j+7].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+            const quota = line[j+8].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
 
             const newUe:Ue = {
               id: i,
               code: code,
               intitule: intitule ,
               intitule_en: intitule_en !== "" ? intitule_en : intitule,
+              domaine: domaine,
               est_optionnelle: est_optionnelle === "Oui",
               semestre: semestre !== "" ? parseInt(semestre) : 1,
               classe: classe,
-              possede_td: possede_td === "Oui"
+              possede_td: possede_td === "Oui",
+              quota_horaire: quota !== "" ? parseInt(quota) : 0
             }
 
             if(possede_td === "Oui")

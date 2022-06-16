@@ -23,7 +23,7 @@ export class TeachersService {
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
-        if(numberOfLines !== 4 && numberOfLines !== 5)
+        if(numberOfLines !== 9 && numberOfLines !== 10)
         {
           reject("Fichier non conforme");
         }
@@ -37,17 +37,48 @@ export class TeachersService {
 
             let j = 0;
 
-            if(numberOfLines === 5)
+            if(numberOfLines === 10)
             {
               ++j;
             }
 
+            const MEN = ["HOMME", "MAN", "MASCULIN", "MALE", "GARCON", "BOY"];
+            const WOMEN = ["FEMME", "WOMAN", "FEMININ", "FEMALE", "FILLE", "GIRL"];
+
+            const noms = line[j].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim().toUpperCase();
+            const sexe = line[j+1].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim().toUpperCase();
+            const telephone = line[j+2].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const email = line[j+3].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const bureau = line[j+4].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const domaines = line[j+5].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim().split(",");
+            const grade = line[j+6].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const etablissement = line[j+7].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const position = line[j+8].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+
+            let dataToSave: string[] = [];
+            domaines.forEach((elt, index, array) =>{
+              if(elt.includes("£"))
+              {
+                elt.split("£").forEach((temp) =>{
+                  dataToSave.push(temp.replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim())
+                });
+              }
+              else{
+               dataToSave.push(elt.replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim());
+              }
+            });
+
             const newEnseignant:Enseignant = {
               id: i,
-              noms: line[j].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim().toUpperCase(),
-              telephone: line[j+1].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim(),
-              email: line[j+2].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim(),
-              bureau: line[j+3].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim(),
+              noms: noms,
+              sexe: MEN.includes(sexe) ? 1 : WOMEN.includes(sexe) ? 2 : 1,
+              telephone: telephone,
+              email: email,
+              bureau: bureau,
+              nomsDomaines: dataToSave,
+              grade: grade,
+              etablissement: etablissement,
+              position: position,
               faculteId: facultyId
             }
 

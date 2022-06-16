@@ -38,6 +38,9 @@ import { PlanningCoursesComponent } from './pages/planning-courses/planning-cour
 import { CoursesTimeTableComponent } from './components/courses-time-table/courses-time-table.component';
 import { ModalUpdatingCoursesPlanningComponent } from './components/modal-updating-courses-planning/modal-updating-courses-planning.component';
 import { MultiCoursesTimeTableComponent } from './components/multi-courses-time-table/multi-courses-time-table.component';
+import { FileInputDomainsComponent } from './pages/file-input-domains/file-input-domains.component';
+import { FileInputTimesRangesComponent } from './pages/file-input-times-ranges/file-input-times-ranges.component';
+import { PlanningTutorialsComponent } from './pages/planning-tutorials/planning-tutorials.component';
 
 // Factory function required during AOT compilation
 export function httpTranslateLoaderFactory(http: HttpClient) {
@@ -75,7 +78,10 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
     PlanningCoursesComponent,
     CoursesTimeTableComponent,
     ModalUpdatingCoursesPlanningComponent,
-    MultiCoursesTimeTableComponent
+    MultiCoursesTimeTableComponent,
+    FileInputDomainsComponent,
+    FileInputTimesRangesComponent,
+    PlanningTutorialsComponent
   ],
   imports: [
     BrowserModule,

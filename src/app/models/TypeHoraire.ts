@@ -1,7 +1,8 @@
 export interface TypeHoraire {
   id?: number,
   pause: number,
-  periodes: Periode[]
+  periodes: Periode[],
+  faculteId?: number
 }
 
 export interface Periode {

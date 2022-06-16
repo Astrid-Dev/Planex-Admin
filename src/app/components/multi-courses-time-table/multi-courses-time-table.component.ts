@@ -70,7 +70,7 @@ export class MultiCoursesTimeTableComponent implements OnInit {
   onSelectClassroom(classroom: Classe)
   {
     //this.hasSelectedClassroom = true;
-    this.router.navigate(["plannings/courses-and-tutorials"], {queryParams: {classroom: classroom.code}});
+    this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
   }
 
 

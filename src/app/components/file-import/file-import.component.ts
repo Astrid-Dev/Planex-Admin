@@ -20,6 +20,8 @@ export class FileImportComponent implements OnInit {
   isReadingFile: boolean = false;
   isAnalysingUrl: boolean = false;
 
+  currentTab: number = 1;
+
   constructor(private fileUploadService: FileUploadService, private translationService: TranslationService) { }
 
   ngOnInit(): void {
@@ -138,6 +140,33 @@ export class FileImportComponent implements OnInit {
           console.error(err);
           this.isAnalysingUrl = false;
         })
+    }
+  }
+
+  setCurrentTab(tab: number)
+  {
+    this.currentTab = tab;
+  }
+
+  getTabClassName(tab: number)
+  {
+    if(tab === this.currentTab)
+    {
+      return "tab-pane fade active in";
+    }
+    else {
+      return "tab-pane fade";
+    }
+  }
+
+  getTabLinkClassName(tab: number)
+  {
+    if(tab === this.currentTab)
+    {
+      return "nav-link active";
+    }
+    else {
+      return "nav-link";
     }
   }
 

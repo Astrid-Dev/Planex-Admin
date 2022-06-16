@@ -8,6 +8,7 @@ import {TeachingUnitsService} from "../../services/teaching-units.service";
 import {Td} from "../../models/Td";
 import deleteProperty = Reflect.deleteProperty;
 import {TutorialsService} from "../../services/tutorials.service";
+import {Classe} from "../../models/Classe";
 
 @Component({
   selector: 'app-file-input-teaching-units',
@@ -27,6 +28,10 @@ export class FileInputTeachingUnitsComponent implements OnInit {
   isImporting: boolean = false;
 
   hasFoundBadsDatas: boolean = false;
+
+  showDataList: boolean = false;
+  showFileImport: boolean = false;
+  showImportedStatus: boolean = false;
 
   constructor(
     private translationService: TranslationService,
@@ -97,16 +102,20 @@ export class FileInputTeachingUnitsComponent implements OnInit {
     let unSyncTeachingUnits: Ue[] = [];
 
     this.teachingUnits.forEach((teachingUnit) =>{
-      if((typeof teachingUnit.classeId === "undefined" || teachingUnit.classeId === null)){
+      if((typeof teachingUnit.classeId === "undefined" || teachingUnit.classeId === null) || (typeof teachingUnit.domaineId === "undefined" || teachingUnit.domaineId === null)){
         let classroom = this.getClassrooms().find(classroom => classroom.code === teachingUnit.classe);
-        if(classroom)
+        let tmp = teachingUnit?.domaine?.toString().toUpperCase();
+        let domain = this.domains.find(elt => elt.nom.toUpperCase() === tmp || elt.nom_en.toUpperCase() === tmp);
+        if(classroom && domain)
         {
           let temp: Ue = {
             ...teachingUnit,
             classeId: classroom.id,
+            domaineId: domain.id
           }
 
           deleteProperty(temp, "classe");
+          deleteProperty(temp, "domaine");
 
           syncTeachingUnits.push(temp);
         }
@@ -114,8 +123,18 @@ export class FileInputTeachingUnitsComponent implements OnInit {
         {
           let temp: Ue = {
             ...teachingUnit,
-            classeId: null,
+            classeId: classroom ? classroom.id : null,
+            domaineId: domain ? domain.id : null,
             defaultClasse: ""+teachingUnit.classe
+          }
+
+          if(temp.classeId === null)
+          {
+            temp = {...temp, defaultClasse: ""+temp.classe}
+          }
+          if(temp.domaineId === null)
+          {
+            temp = {...temp, defaultDomaine: ""+temp.domaine}
           }
 
           unSyncTeachingUnits.push(temp);
@@ -127,17 +146,23 @@ export class FileInputTeachingUnitsComponent implements OnInit {
       }
     });
 
+    console.log(syncTeachingUnits);
+    console.log(unSyncTeachingUnits);
+
     this.badTeachingUnits.forEach((teachingUnit) =>{
       let classroom = this.getClassrooms().find(classroom => classroom.code === teachingUnit.classe);
-
-      if(classroom)
+      let tmp = teachingUnit?.domaine?.toString().toUpperCase();
+      let domain = this.domains.find(elt => elt.nom.toUpperCase() === tmp || elt.nom_en.toUpperCase() === tmp);
+      if(classroom && domain)
       {
         let temp: Ue = {
           ...teachingUnit,
           classeId: classroom.id,
+          domaineId: domain.id
         }
 
         deleteProperty(temp, "classe");
+        deleteProperty(temp, "domaine");
 
         syncTeachingUnits.push(temp);
       }
@@ -145,8 +170,18 @@ export class FileInputTeachingUnitsComponent implements OnInit {
       {
         let temp: Ue = {
           ...teachingUnit,
-          classeId: null,
+          classeId: classroom ? classroom.id : null,
+          domaineId: domain ? domain.id : null,
           defaultClasse: ""+teachingUnit.classe
+        }
+
+        if(temp.classeId === null)
+        {
+          temp = {...temp, defaultClasse: ""+temp.classe}
+        }
+        if(temp.domaineId === null)
+        {
+          temp = {...temp, defaultDomaine: ""+temp.domaine}
         }
 
         unSyncTeachingUnits.push(temp);
@@ -179,6 +214,10 @@ export class FileInputTeachingUnitsComponent implements OnInit {
   {
     this.hasFoundBadsDatas = false;
     this.syncTeachingUnitsWithClassrooms();
+  }
+
+  get domains(){
+    return this.facultyService.facultyDomains;
   }
 
   sendTeachingUnits()
@@ -227,6 +266,9 @@ export class FileInputTeachingUnitsComponent implements OnInit {
     this.tutorialsService.createTutorials(this.tutorials)
       .then((tutorials: Td[] | any) =>{
         this.facultyService.setFacultyTutorials(tutorials);
+        this.showImportedStatus = true;
+        this.showDataList = false;
+        this.showFileImport = false;
         this.isImporting = false;
         Swal.fire({
           title: this.translationService.getValueOf("ALERT.SUCCESS"),
@@ -259,15 +301,40 @@ export class FileInputTeachingUnitsComponent implements OnInit {
     }
   }
 
+  get hasAlreadyUploadedData(){
+    let result = (this.hasLoadedDatas && this.facultyService.facultyTeachingUnits.length > 0);
+
+    if(result && (!this.showDataList && !this.showFileImport))
+    {
+      this.showImportedStatus = true;
+      this.showFileImport = false;
+      this.showDataList = false;
+    }
+
+    if(this.hasLoadedDatas && !this.showDataList && !this.showFileImport && !this.showImportedStatus)
+    {
+      this.showFileImport = true;
+    }
+
+    return result;
+  }
+
+  get canShowFileImport(){
+    return ((this.hasLoadedDatas && this.showFileImport));
+  }
+
+  get canShowDataList(){
+    return ((this.hasLoadedDatas) && (this.showDataList));
+  }
+
+  get canShowImportedStatus()
+  {
+    return this.hasLoadedDatas && this.showImportedStatus;
+  }
+
   get canUploadFile()
   {
-    if(this.facultyService.facultyClassrooms.length === 0)
-    {
-      return null;
-    }
-    else{
-      return this.facultyService.facultyTeachingUnits.length === 0;
-    }
+    return (this.facultyService.facultyClassrooms.length > 0 && this.facultyService.facultyDomains.length > 0);
   }
 
   getClassrooms(){
