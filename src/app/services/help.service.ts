@@ -22,4 +22,34 @@ export class HelpService {
   {
     return this.letters.join(",").toUpperCase().split(",");
   }
+
+  getLettersInInterval(letter1: string, letter2: string, firstInside: boolean = false, lastInside: boolean = false)
+  {
+    let init = this.getLetterIndex(letter1) + 1;
+    let end = this.getLetterIndex(letter2);
+
+    if(firstInside)
+    {
+      --init;
+    }
+
+    if(lastInside)
+    {
+      ++end;
+    }
+
+    let result: any = [];
+
+    for(let i = init; i < end; i++)
+    {
+      result.push(this.letters[i]);
+    }
+
+    return result;
+  }
+
+  getLetterIndex(letter: string)
+  {
+    return this.letters.indexOf(letter);
+  }
 }

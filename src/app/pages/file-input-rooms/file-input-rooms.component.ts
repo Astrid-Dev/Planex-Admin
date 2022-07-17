@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import Swal from "sweetalert2";
 import {Salle} from "../../models/Salle";
 import {RoomsService} from "../../services/rooms.service";
 import {FacultyService} from "../../services/faculty.service";
+import {NgxSmartModalService} from "ngx-smart-modal";
+
+const MODAL_ID = "roomEditionModal";
 
 @Component({
   selector: 'app-file-input-rooms',
   templateUrl: './file-input-rooms.component.html',
   styleUrls: ['./file-input-rooms.component.scss']
 })
-export class FileInputRoomsComponent implements OnInit {
+export class FileInputRoomsComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -24,10 +27,13 @@ export class FileInputRoomsComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  modal: any = null;
+
   constructor(
     private translationService: TranslationService,
     private roomsService: RoomsService,
-    private facultyService: FacultyService
+    private facultyService: FacultyService,
+    private ngxSmartModalService: NgxSmartModalService
   ) { }
 
   ngOnInit(): void {
@@ -45,6 +51,10 @@ export class FileInputRoomsComponent implements OnInit {
         link: "files-input/roomss"
       }
     )
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -147,4 +157,31 @@ export class FileInputRoomsComponent implements OnInit {
     return this.hasLoadedDatas && this.showImportedStatus;
   }
 
+  onConsult()
+  {
+    this.rooms = this.facultyService.facultyRooms;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
+  onEditRoom(room: Salle)
+  {
+    this.modal.setData(room, true);
+    this.modal.open();
+  }
 }

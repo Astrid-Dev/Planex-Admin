@@ -5,6 +5,7 @@ import html2canvas from "html2canvas";
 import {jsPDF} from "jspdf";
 import {Router} from "@angular/router";
 import {Classe} from "../../models/Classe";
+import {ActionZone} from "../../models/ActionZone";
 
 @Component({
   selector: 'app-multi-courses-time-table',
@@ -13,7 +14,7 @@ import {Classe} from "../../models/Classe";
 })
 export class MultiCoursesTimeTableComponent implements OnInit {
 
-  @Input("filter") filter: number | null = null;
+  @Input("filter") filter: {actionZone: ActionZone, itemId: any} = {actionZone: ActionZone.GLOBAL, itemId: null};
 
   isExporting: boolean = false;
 
@@ -28,7 +29,21 @@ export class MultiCoursesTimeTableComponent implements OnInit {
 
   get classrooms()
   {
-    return this.filter === null ? this.facultyService.facultyClassrooms : this.facultyService.facultyClassrooms.filter(classroom => classroom.filiereId === this.filter);
+    if(this.filter.actionZone === ActionZone.GLOBAL)
+    {
+      return this.facultyService.facultyClassrooms;
+    }
+    else if(this.filter.actionZone === ActionZone.DEPARTMENT)
+    {
+      return this.facultyService.getADepartmentClassrooms(this.filter.itemId);
+    }
+    else if(this.filter.actionZone === ActionZone.SECTOR)
+    {
+      return this.facultyService.getASectorClassrooms(this.filter.itemId);
+    }
+    else{
+      return [];
+    }
   }
 
   get faculty()

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import {FacultyService} from "../../services/faculty.service";
@@ -7,13 +7,18 @@ import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {PlanningCoursesService} from "../../services/planning-courses.service";
 import Swal from "sweetalert2";
 import {Filiere} from "../../models/Filiere";
+import {NgxSmartModalService} from "ngx-smart-modal";
+import {ActionZone} from "../../models/ActionZone";
+import {Departement} from "../../models/Departement";
+
+const MODAL_ID = "coursesPlanningGenerationModal";
 
 @Component({
   selector: 'app-planning-courses',
   templateUrl: './planning-courses.component.html',
   styleUrls: ['./planning-courses.component.scss']
 })
-export class PlanningCoursesComponent implements OnInit {
+export class PlanningCoursesComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -22,22 +27,32 @@ export class PlanningCoursesComponent implements OnInit {
   hasLoadedPlannings: boolean | null = null;
 
   hasSelectedClassroom: boolean = false;
+  hasSelectedSector: boolean = false;
+  hasSelectedDepartment: boolean = false;
   hasSelectedGlobalPlanning: boolean = false;
 
   selectedClassroomCode: string | null = null;
+  selectedSectorCode: string | null = null;
+  selectedDepartmentName: string | null = null;
+
   currentClassroom: Classe | null = null;
+  currentSector: Filiere | null = null;
+  currentDepartment: Departement | null = null;
 
-  currentSectorCode: string | undefined = "";
+  currentClassroomSector : string | undefined;
 
-  filterResult: number | null = null;
-  filterParam: string | null = null;
+  currentActionZone: ActionZone = ActionZone.GLOBAL;
+  currentActionZoneId: any = null;
+
+  modal: any = null;
 
   constructor(
     private translationService: TranslationService,
     private facultyService: FacultyService,
     private planningCoursesService: PlanningCoursesService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private ngxSmartModalService: NgxSmartModalService
   ) {
     router.events
       .subscribe(event =>
@@ -47,18 +62,42 @@ export class PlanningCoursesComponent implements OnInit {
           if(this.route.snapshot.queryParamMap.get("classroom"))
           {
             this.hasSelectedGlobalPlanning = false;
+            this.hasSelectedDepartment = false;
+            this.hasSelectedSector = false;
             this.selectedClassroomCode = this.route.snapshot.queryParamMap.get("classroom");
             this.hasSelectedClassroom = true;
+            this.currentActionZone = ActionZone.CLASSROOM;
+            this.currentActionZoneId = null;
             this.verifyClassroomCode();
+          }
+          else if(this.route.snapshot.queryParamMap.get("sector"))
+          {
+            this.hasSelectedGlobalPlanning = false;
+            this.hasSelectedDepartment = false;
+            this.hasSelectedClassroom = false;
+            this.selectedSectorCode = this.route.snapshot.queryParamMap.get("sector");
+            this.hasSelectedSector = true;
+            this.verifySectorCode();
+          }
+          else if(this.route.snapshot.queryParamMap.get("department"))
+          {
+            this.hasSelectedClassroom = false;
+            this.hasSelectedSector = false;
+            this.hasSelectedGlobalPlanning = false;
+            this.selectedDepartmentName = this.route.snapshot.queryParamMap.get("department");
+            this.hasSelectedDepartment = true;
+            this.verifyDepartmentName();
           }
           else
           {
             this.hasSelectedClassroom = false;
-            if(this.route.snapshot.queryParamMap.get("filter"))
+            this.hasSelectedSector = false;
+            this.hasSelectedDepartment = false;
+            this.currentActionZone = ActionZone.GLOBAL;
+            this.currentActionZoneId = null;
+            if(this.route.snapshot.queryParamMap.get("filter") && this.route.snapshot.queryParamMap.get("filter") === "all")
             {
-              this.filterParam = this.route.snapshot.queryParamMap.get("filter");
               this.hasSelectedGlobalPlanning = true;
-              this.verifySectorCode();
             }
             else
             {
@@ -82,6 +121,10 @@ export class PlanningCoursesComponent implements OnInit {
         linkName: "SIDEMENU.PLANNING.COURSES"
       }
     );
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -137,13 +180,15 @@ export class PlanningCoursesComponent implements OnInit {
     return (this.facultyService.facultyTeachers.length > 0 &&
       this.facultyService.facultyTeachingUnits.length > 0 &&
       this.facultyService.facultyRooms.length > 0 &&
-      this.facultyService.facultyClassrooms.length > 0
+      this.facultyService.facultyClassrooms.length > 0 &&
+      this.facultyService.facultyCoursesRepartition.length > 0 &&
+      this.facultyService.facultyTimes.length > 0
     );
   }
 
   get canShowClassroomsList()
   {
-    return (this.hasLoadedDatasWithSuccess && !(this.hasSelectedClassroom || this.hasSelectedGlobalPlanning));
+    return (this.hasLoadedDatasWithSuccess && !(this.hasSelectedClassroom || this.hasSelectedSector || this.hasSelectedDepartment || this.hasSelectedGlobalPlanning));
   }
 
   get hasLoadedDatasWithError()
@@ -173,7 +218,7 @@ export class PlanningCoursesComponent implements OnInit {
 
   get canShowMultiTimeTables()
   {
-    return this.canDisplay && this.hasSelectedGlobalPlanning;
+    return this.canDisplay && (this.hasSelectedGlobalPlanning || this.hasSelectedDepartment || this.hasSelectedSector);
   }
 
   get classrooms()
@@ -181,9 +226,14 @@ export class PlanningCoursesComponent implements OnInit {
     return this.facultyService.classrooms;
   }
 
-  onSelectClassroom(classroom: Classe)
+  get departments()
   {
-    this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
+    return this.facultyService.facultyDepartments;
+  }
+
+  get sectors()
+  {
+    return this.facultyService.facultySectors;
   }
 
   verifyClassroomCode()
@@ -196,40 +246,50 @@ export class PlanningCoursesComponent implements OnInit {
     else
     {
       this.currentClassroom = classroom;
-      this.currentSectorCode = this.facultyService.facultySectors.find(elt => elt.id === classroom.filiereId)?.code;
+      this.currentClassroomSector = this.sectors.find(elt => elt.id === classroom.filiereId)?.code;
       this.hasSelectedClassroom = true;
     }
   }
 
   verifySectorCode()
   {
-    if(this.filterParam !== "all")
+    let sector: any = this.sectors.find(elt => elt.code === this.selectedSectorCode);
+    if(!sector)
     {
-      let sector: any = this.facultyService.facultySectors.find(elt => elt.code === this.filterParam);
-      if(!sector)
-      {
-        this.filterResult = null;
-        this.hasSelectedGlobalPlanning = false;
-      }
-      else
-      {
-        this.filterResult = sector.id;
-        this.currentSectorCode =  sector.code;
-        this.hasSelectedGlobalPlanning = true;
-      }
+      this.hasSelectedSector = false;
     }
     else
     {
-      this.filterResult = null;
-      this.hasSelectedGlobalPlanning = true;
+      this.currentActionZone = ActionZone.SECTOR;
+      this.currentActionZoneId = sector.id;
+      this.currentSector = sector;
+      this.hasSelectedSector = true;
+    }
+
+  }
+
+  verifyDepartmentName()
+  {
+    let department: any = this.departments.find(elt => (elt.nom.toUpperCase() === this.selectedDepartmentName?.toUpperCase() || elt.nom_en.toUpperCase() === this.selectedDepartmentName?.toUpperCase()));
+    if(!department)
+    {
+      this.hasSelectedDepartment = false;
+    }
+    else
+    {
+      this.currentActionZone = ActionZone.DEPARTMENT;
+      this.currentActionZoneId = department.id;
+      this.currentDepartment = department;
+      this.hasSelectedDepartment = true;
     }
 
   }
 
   get timeTypeHasBeenConfigured()
   {
-    let timeType = ((this.currentClassroom !== null) ? (this.facultyService.facultySectors.find(elt => elt.id === this.currentClassroom?.filiereId)?.typeHoraireId) : null);
-    return timeType !== null;
+    let timeType = ((this.currentClassroom !== null) ? (this.sectors.find(elt => elt.id === this.currentClassroom?.filiereId)?.typeHoraireId) : null);
+    // return timeType !== null;
+    return true;
   }
 
   retry()
@@ -246,17 +306,51 @@ export class PlanningCoursesComponent implements OnInit {
 
   goToSectorConfigurationTime()
   {
-    this.router.navigate(["configurations/times"], {state: {sector: this.currentSectorCode, classroom: this.selectedClassroomCode}});
+    this.router.navigate(["configurations/times"], {state: {sector: this.currentClassroomSector, classroom: this.selectedClassroomCode}});
   }
 
   onSelectAAllClassrooms()
   {
-    this.router.navigate(["plannings/courses"], {queryParams: {filter: "all"}});
+    this.openModal({filter: "all"}, this.translationService.getValueOf("PLANNINGS.COURSES.NOPLANNING"), ActionZone.GLOBAL);
+    //this.router.navigate(["plannings/courses"], {queryParams: {filter: "all"}});
+  }
+
+  onSelectDepartmentClassrooms(department: Departement)
+  {
+    this.openModal({department: this.translationService.getCurrentLang() === "fr" ? department.nom : department.nom_en}, this.translationService.getValueOf("PLANNINGS.COURSES.NODEPARTMENTPLANNING"), ActionZone.DEPARTMENT, department.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {department: this.translationService.getCurrentLang() === "fr" ? department.nom : department.nom_en}});
   }
 
   onSelectSectorClassrooms(sector: Filiere)
   {
-    this.router.navigate(["plannings/courses"], {queryParams: {filter: sector.code}});
+    this.openModal({sector: sector.code}, this.translationService.getValueOf("PLANNINGS.COURSES.NOSECTORPLANNING"), ActionZone.SECTOR, sector.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {filter: sector.code}});
+  }
+
+  onSelectClassroom(classroom: Classe)
+  {
+    this.openModal({classroom: classroom.code}, this.translationService.getValueOf("PLANNINGS.COURSES.NOCLASSROOMPLANNING"), ActionZone.CLASSROOM, classroom.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
+  }
+
+  openModal(queryParams: any, alertText: string, actionZone: ActionZone, itemId: any = null)
+  {
+    Swal.fire({
+      text: alertText,
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: this.translationService.getValueOf("SUBMITS.YES"),
+      denyButtonText: this.translationService.getValueOf("SUBMITS.NO"),
+      cancelButtonText: this.translationService.getValueOf("SUBMITS.CANCEL")
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.modal.setData({actionZone: actionZone, queryParams: queryParams, itemId: itemId}, true);
+        this.modal.open();
+      } else if (result.isDenied) {
+        this.router.navigate(["plannings/courses"], {queryParams: queryParams});
+      }
+    })
   }
 
 }

@@ -83,14 +83,14 @@ export class RoomsService {
   {
     return new Promise((resolve, reject) =>{
       this.http.post(ROOMS_URL, roomsDatas)
-        .subscribe(
-          res =>{
+        .subscribe({
+          next: res => {
             resolve(res);
           },
-          err =>{
+          error: err => {
             reject(err);
           }
-        )
+        })
     })
   }
 }

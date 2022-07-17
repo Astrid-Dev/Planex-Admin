@@ -264,4 +264,25 @@ export class FileInputStudentsComponent implements OnInit {
     return this.facultyService.facultyClassrooms;
   }
 
+  onConsult()
+  {
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
 }

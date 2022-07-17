@@ -1,0 +1,38 @@
+.handler{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  border-radius: 5px;
+
+  div{
+    width: 25px;
+    height: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .minus, .plus{
+    font-size: 1.3em;
+    font-weight: bold;
+  }
+
+  .minus{
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+  }
+
+  .plus{
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+}
+
+legend{
+  font-size: 1.15em;
+}
+
+.select-all{
+  margin-left: 14px;
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import {Ue} from "../../models/Ue";
@@ -9,13 +9,16 @@ import {Td} from "../../models/Td";
 import deleteProperty = Reflect.deleteProperty;
 import {TutorialsService} from "../../services/tutorials.service";
 import {Classe} from "../../models/Classe";
+import {NgxSmartModalService} from "ngx-smart-modal";
+
+const MODAL_ID = "teachingUnitEditionModal";
 
 @Component({
   selector: 'app-file-input-teaching-units',
   templateUrl: './file-input-teaching-units.component.html',
   styleUrls: ['./file-input-teaching-units.component.scss']
 })
-export class FileInputTeachingUnitsComponent implements OnInit {
+export class FileInputTeachingUnitsComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -33,11 +36,14 @@ export class FileInputTeachingUnitsComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  modal: any = null;
+
   constructor(
     private translationService: TranslationService,
     private facultyService: FacultyService,
     private teachingUnitsService: TeachingUnitsService,
-    private tutorialsService: TutorialsService
+    private tutorialsService: TutorialsService,
+    private ngxSmartModalService: NgxSmartModalService
     ) { }
 
   ngOnInit(): void {
@@ -55,6 +61,10 @@ export class FileInputTeachingUnitsComponent implements OnInit {
         link: "files-input/teaching-units"
       }
     );
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -103,7 +113,7 @@ export class FileInputTeachingUnitsComponent implements OnInit {
 
     this.teachingUnits.forEach((teachingUnit) =>{
       if((typeof teachingUnit.classeId === "undefined" || teachingUnit.classeId === null) || (typeof teachingUnit.domaineId === "undefined" || teachingUnit.domaineId === null)){
-        let classroom = this.getClassrooms().find(classroom => classroom.code === teachingUnit.classe);
+        let classroom = this.classrooms.find(classroom => classroom.code === teachingUnit.classe);
         let tmp = teachingUnit?.domaine?.toString().toUpperCase();
         let domain = this.domains.find(elt => elt.nom.toUpperCase() === tmp || elt.nom_en.toUpperCase() === tmp);
         if(classroom && domain)
@@ -150,7 +160,7 @@ export class FileInputTeachingUnitsComponent implements OnInit {
     console.log(unSyncTeachingUnits);
 
     this.badTeachingUnits.forEach((teachingUnit) =>{
-      let classroom = this.getClassrooms().find(classroom => classroom.code === teachingUnit.classe);
+      let classroom = this.classrooms.find(classroom => classroom.code === teachingUnit.classe);
       let tmp = teachingUnit?.domaine?.toString().toUpperCase();
       let domain = this.domains.find(elt => elt.nom.toUpperCase() === tmp || elt.nom_en.toUpperCase() === tmp);
       if(classroom && domain)
@@ -337,12 +347,59 @@ export class FileInputTeachingUnitsComponent implements OnInit {
     return (this.facultyService.facultyClassrooms.length > 0 && this.facultyService.facultyDomains.length > 0);
   }
 
-  getClassrooms(){
+  get classrooms(){
     return this.facultyService.facultyClassrooms;
   }
 
   getTeachingUnits(){
     return this.facultyService.facultyTeachingUnits;
   }
+  onConsult()
+  {
+    this.teachingUnits = this.facultyService.facultyTeachingUnits;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
 
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
+  classroomCode(classroomId: number | null | undefined)
+  {
+    return this.classrooms.find(elt => elt.id === classroomId)?.code;
+  }
+
+  optionalStatus(value: boolean | undefined)
+  {
+    if(this.translationService.getCurrentLang() === "fr")
+    {
+      return value ? "Oui" : "Non";
+    }
+    else{
+      return value ? "Yes" : "No";
+    }
+  }
+
+  entitled(teachingUnit: Ue)
+  {
+    return this.translationService.getCurrentLang() === "fr" ? teachingUnit.intitule : teachingUnit.intitule_en;
+  }
+
+  onEditTeachingUnit(teachingUnit: Ue)
+  {
+    this.modal.setData(teachingUnit, true);
+    this.modal.open();
+  }
 }

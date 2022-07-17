@@ -55,24 +55,7 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
     let classroomId: any = this.classroom.infos?.id;
     let predefinedPlannings: PlanningCours[] = this.planningCoursesService.getPlanningOfOneClassroom(classroomId);
     this.isFirstTimePlanning = predefinedPlannings.length === 0;
-    console.log(this.classroom);
-    let classroom: any = this.classroom.infos;
-    let temp: GeneratePlanningParameter = {
-      coursesGroups: this.coursesGroups,
-      classroom: classroom,
-      classroomStudentsNumber: this.studentsNumber,
-      teachersDomains: this.facultyService.facultyTeachersDomains,
-      teachingUnits: this.teachingUnits,
-      academicYearId: this.facultyService.currentFaculty.anneeScolaireId,
-      allPeriods: this.facultyService.allPeriods,
-      days: this.facultyService.allDays,
-      domains: this.facultyService.facultyDomains,
-      periods: this.periods,
-      rooms: this.rooms,
-      teachers: this.teachers
-    }
-    let generatedPlanning = this.planningCoursesService.generateAClassroomCoursesPlanning(temp);
-    this.plannings = predefinedPlannings.length > 0 ? predefinedPlannings : generatedPlanning.length > 0 ? generatedPlanning : this.defaultPlanning;
+    this.plannings = this.isFirstTimePlanning ? this.defaultPlanning : predefinedPlannings;
   }
 
   get faculty(){
@@ -107,7 +90,7 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
       return this.facultyService.getATimeType(this.classroom.sector?.typeHoraireId)?.periodes;
     }
     else{
-      return this.undefinedPeriods;
+      return this.facultyService.defaultFacultyTimeType ? this.facultyService.defaultFacultyTimeType.periodes : this.undefinedPeriods;
     }
   }
 

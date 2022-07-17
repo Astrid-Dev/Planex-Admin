@@ -12,12 +12,44 @@
               <div class="center flex-column" *ngIf="canShowImportedStatus">
                 <img src="assets/images/saved-data.jpg"/>
                 <div class="mt-2">
-                  <button class="btn btn-outline-amber mr-2">Consulter</button>
-                  <button class="btn btn-outline-danger">Complémenter</button>
+                  <button class="btn btn-outline-amber mr-2" (click)="onConsult()">{{'SUBMITS.CONSULT' | translate}}</button>
+                  <button class="btn btn-outline-danger" (click)="onComplement()">{{'SUBMITS.COMPLEMENT' | translate}}</button>
                 </div>
               </div>
 
               <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+
+              <div *ngIf="canShowDataList">
+                <i (click)="onCancelConsult()" class="fa fa-close text-danger cursor-pointer"></i>
+                <div class="table-responsive">
+                  <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                      <th>N°</th>
+                      <th>{{'FILESINPUT.CLASSROOMS.CODE' | translate}}</th>
+                      <th>{{'FILESINPUT.CLASSROOMS.ENTITLED' | translate}}</th>
+                      <th>{{'FILESINPUT.CLASSROOMS.SECTOR' | translate}}</th>
+                      <th>{{'FILESINPUT.CLASSROOMS.LEVEL' | translate}}</th>
+                      <th>{{'FILESINPUT.CLASSROOMS.STUDENTSNUMBER' | translate}}</th>
+                      <th>{{'GLOBAL.EDIT' | translate}}</th>
+                      <th>{{'GLOBAL.DELETE' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let classroom of classrooms; index as i">
+                      <td>{{(i+1)}}</td>
+                      <td>{{classroom.code}}</td>
+                      <td>{{entitled(classroom)}}</td>
+                      <td>{{sector(classroom.filiereId)}}</td>
+                      <td>{{level(classroom.niveauId)}}</td>
+                      <td>{{studentsNumber(classroom.id)}}</td>
+                      <td><i (click)="onEditClassroom(classroom)" class="fa fa-edit text-primary cursor-pointer"></i></td>
+                      <td><i class="fa fa-close text-danger cursor-pointer"></i></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
 
             <div class="required-file-importation center flex-column" *ngIf="!canUploadFile">
@@ -50,7 +82,7 @@
                           <option [value]="classroom.defaultFiliere">{{classroom.defaultFiliere}}</option>
                         </optgroup>
                         <optgroup [label]="'FILESINPUT.CLASSROOMS.POSSIBLEVALUES' | translate">
-                          <option *ngFor="let sector of getSectors()" [value]="sector.code">{{sector.code}}</option>
+                          <option *ngFor="let sector of sectors" [value]="sector.code">{{sector.code}}</option>
                         </optgroup>
                       </select>
                     </td>
@@ -61,7 +93,7 @@
                           <option [value]="classroom.defaultNiveau">{{classroom.defaultNiveau}}</option>
                         </optgroup>
                         <optgroup label="Valeurs possibles">
-                          <option *ngFor="let level of getLevels()" [value]="level.code">{{level.code}}</option>
+                          <option *ngFor="let level of levels" [value]="level.code">{{level.code}}</option>
                         </optgroup>
                       </select>
                     </td>
@@ -90,4 +122,5 @@
     </div>
   </div>
 </div>
+<app-modal-classroom-edition></app-modal-classroom-edition>
 

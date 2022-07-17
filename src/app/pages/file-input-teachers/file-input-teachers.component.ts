@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import {Enseignant} from "../../models/Enseignant";
@@ -8,13 +8,16 @@ import {FacultyService} from "../../services/faculty.service";
 import {Classe} from "../../models/Classe";
 import {Ue} from "../../models/Ue";
 import deleteProperty = Reflect.deleteProperty;
+import {NgxSmartModalService} from "ngx-smart-modal";
+
+const MODAL_ID = "teacherEditionModal";
 
 @Component({
   selector: 'app-file-input-teachers',
   templateUrl: './file-input-teachers.component.html',
   styleUrls: ['./file-input-teachers.component.scss']
 })
-export class FileInputTeachersComponent implements OnInit {
+export class FileInputTeachersComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -30,10 +33,21 @@ export class FileInputTeachersComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  tableSizes: any = [5, 10, 15, 25, 35];
+  paginationConfig = {
+    itemsPerPage: 10,
+    currentPage: 1,
+    totalItems: 0
+  }
+  searchText: string = "";
+
+  modal: any = null;
+
   constructor(
     private translationService: TranslationService,
     private teachersService: TeachersService,
-    private facultyService: FacultyService
+    private facultyService: FacultyService,
+    private ngxSmartModalService: NgxSmartModalService
     ) { }
 
   ngOnInit(): void {
@@ -51,6 +65,10 @@ export class FileInputTeachersComponent implements OnInit {
         link: "files-input/teachers"
       }
     )
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -273,6 +291,13 @@ export class FileInputTeachersComponent implements OnInit {
       })
   }
 
+  get teachersList()
+  {
+    let result = this.teachers.filter(elt => elt.noms.toUpperCase().includes(this.searchText.toUpperCase()));
+    this.setPaginationConfig("totalItems", result.length);
+    return result;
+  }
+
   get hasAlreadyUploadedData(){
     let result = (this.hasLoadedDatas && this.facultyService.facultyTeachers.length > 0);
 
@@ -312,6 +337,68 @@ export class FileInputTeachersComponent implements OnInit {
   get domains()
   {
     return this.facultyService.facultyDomains;
+  }
+
+  onConsult()
+  {
+    this.teachers = this.facultyService.facultyTeachers;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
+  onTableDataChange(event: any) {
+    this.setPaginationConfig("currentPage", event);
+  }
+
+  onTableSizeChange(event: any): void {
+    this.setPaginationConfig("itemsPerPage", event);
+  }
+
+  getItemPosition(itemIndex: number)
+  {
+    return ((this.paginationConfig.itemsPerPage * (this.paginationConfig.currentPage - 1)) + (itemIndex + 1))
+  }
+
+  setPaginationConfig(field: string, value: any)
+  {
+    this.paginationConfig = {
+      ...this.paginationConfig,
+      [field]: value
+    }
+  }
+
+  get resultDescription()
+  {
+    if(this.teachersList.length > 0)
+    {
+      return this.translationService.getValueOf("GLOBAL.RESULTS") + " " +((this.paginationConfig.itemsPerPage * (this.paginationConfig.currentPage - 1)) + 1) + " "+
+        this.translationService.getValueOf("GLOBAL.TO")+" "+((this.paginationConfig.itemsPerPage * this.paginationConfig.currentPage)) +" "+
+        this.translationService.getValueOf("GLOBAL.OF")+" " + this.paginationConfig.totalItems;
+    }
+    else{
+      return "";
+    }
+  }
+
+  onEditTeacher(teacher: Enseignant)
+  {
+    this.modal.setData(teacher, true);
+    this.modal.open();
   }
 
 }

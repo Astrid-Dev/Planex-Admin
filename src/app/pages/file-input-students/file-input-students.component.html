@@ -12,8 +12,8 @@
               <div class="center flex-column" *ngIf="canShowImportedStatus">
                 <img src="assets/images/saved-data.jpg"/>
                 <div class="mt-2">
-                  <button class="btn btn-outline-amber mr-2">Consulter</button>
-                  <button class="btn btn-outline-danger">Complémenter</button>
+                  <button class="btn btn-outline-amber mr-2" (click)="onConsult()">{{'SUBMITS.CONSULT' | translate}}</button>
+                  <button class="btn btn-outline-danger" (click)="onComplement()">{{'SUBMITS.COMPLEMENT' | translate}}</button>
                 </div>
               </div>
 

@@ -1,0 +1,103 @@
+<ngx-smart-modal #coursesPlanningGenerationModal identifier="coursesPlanningGenerationModal">
+  <div  style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">Génération du planning de cours</h3>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-6 mb-2">
+        <label>Nombre d'UE par jour</label>
+        <div class="handler">
+          <div class="minus cursor-pointer bg-danger" (click)="onTeachingUnitsPerDayChange(false)">-</div>
+          <div class="count-value">{{teachingUnitsPerDay.value}}</div>
+          <div class="plus cursor-pointer bg-success" (click)="onTeachingUnitsPerDayChange(true)">+</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-2">
+        <label>Passage d'une UE par semaine</label>
+        <div class="handler">
+          <div class="minus cursor-pointer bg-danger" (click)="onOneTeachingUnitPerWeekChange(false)">-</div>
+          <div class="count-value">{{oneTeachingUnitPerWeek.value}}</div>
+          <div class="plus cursor-pointer bg-success" (click)="onOneTeachingUnitPerWeekChange(true)">+</div>
+        </div>
+      </div>
+
+      <div class="col-md-6 mb-2">
+        <label>Nombre de périodes entre deux UE</label>
+        <div class="handler">
+          <div class="minus cursor-pointer bg-danger" (click)="onPeriodsBetweenTwoTeachingUnitsChange(false)">-</div>
+          <div class="count-value">{{periodsBetweenTwoTeachingUnits.value}}</div>
+          <div class="plus cursor-pointer bg-success" (click)="onPeriodsBetweenTwoTeachingUnitsChange(true)">+</div>
+        </div>
+      </div>
+
+      <fieldset class="col-md-12">
+        <legend>Jours</legend>
+        <label class="select-all col-md-3 display-inline-block custom-control custom-checkbox">
+          <input type="checkbox" (change)="onDayCheckChange(true)" [disabled]="selectAllDays === true" [(ngModel)]="selectAllDays" name="selectAllDays" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">Tous les jours</span>
+        </label>
+        <label class="col-md-3 display-inline-block custom-control custom-checkbox" *ngFor="let check of daysChecksList; index as i">
+          <input type="checkbox" name="dayCheck{{i}}" (change)="onDayCheckChange()" [(ngModel)]="check.checked" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">{{check.label}}</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="col-md-12" *ngIf="isForGlobal">
+        <legend>Départements</legend>
+        <label class="select-all col-md-6 display-inline-block custom-control custom-checkbox">
+          <input type="checkbox" (change)="onDepartmentCheckChange(true)" [disabled]="selectAllDepartments === true" [(ngModel)]="selectAllDepartments" name="selectAllDepartments" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">Tous les départements</span>
+        </label>
+        <label class="col-md-6 display-inline-block custom-control custom-checkbox" *ngFor="let check of departmentsChecksList; index as i">
+          <input type="checkbox" name="departmentCheck{{i}}" (change)="onDepartmentCheckChange()" [(ngModel)]="check.checked" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">{{check.label}}</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="col-md-12" *ngIf="isForDepartment">
+        <legend>Filières</legend>
+        <label class="select-all col-md-4 display-inline-block custom-control custom-checkbox">
+          <input type="checkbox" (change)="onSectorCheckChange(true)" [disabled]="selectAllSectors === true" [(ngModel)]="selectAllSectors" name="selectAllSectors" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">Toutes les filières</span>
+        </label>
+        <label class="col-md-4 display-inline-block custom-control custom-checkbox" *ngFor="let check of sectorsChecksList; index as i">
+          <input type="checkbox" name="departmentCheck{{i}}" (change)="onSectorCheckChange()" [(ngModel)]="check.checked" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">{{check.label}}</span>
+        </label>
+      </fieldset>
+
+      <fieldset class="col-md-12" *ngIf="isForSector">
+        <legend>Niveaux</legend>
+        <label class="select-all col-md-4 display-inline-block custom-control custom-checkbox">
+          <input type="checkbox" (change)="onLevelCheckChange(true)" [disabled]="selectAllLevels === true" [(ngModel)]="selectAllLevels" name="selectAllLevels" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">Tous les niveaux</span>
+        </label>
+        <label class="col-md-4 display-inline-block custom-control custom-checkbox" *ngFor="let check of levelsChecksList; index as i">
+          <input type="checkbox" name="departmentCheck{{i}}" (change)="onSectorCheckChange()" [(ngModel)]="check.checked" class="custom-control-input">
+          <span class="c-indicator bg-primary custom-control-indicator"></span>
+          <span class="custom-control-description">{{check.label}}</span>
+        </label>
+      </fieldset>
+    </div>
+
+    <div class="row mt-3 text-md-center">
+      <div *ngIf="isLoading">
+        <i class=" fa fa-spinner fa-2x fa-pulse text-primary"></i>
+        Veuillez patienter...
+      </div>
+      <button *ngIf="!isLoading" class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button *ngIf="!isLoading" class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

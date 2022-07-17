@@ -25,6 +25,14 @@
   flex-direction: column;
 }
 
+.justify-content-space-between{
+  justify-content: space-between;
+}
+
+.align-items-center{
+  align-items: center;
+}
+
 .center
 {
   display: flex;
@@ -53,4 +61,18 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+
+.ngx-pagination{
+  li{
+    margin-left: 10px;
+    background-color: #eee;
+  }
+  li.pagination-previous, li.pagination-next{
+    background-color: initial;
+  }
+
+  li.current{
+    background-color: #00B5B8;
+  }
 }

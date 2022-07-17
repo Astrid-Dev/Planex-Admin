@@ -3,6 +3,7 @@ import {Classe} from "../../models/Classe";
 import {FacultyService} from "../../services/faculty.service";
 import {TranslationService} from "../../services/translation.service";
 import {Filiere} from "../../models/Filiere";
+import {Departement} from "../../models/Departement";
 
 @Component({
   selector: 'app-classrooms-list',
@@ -13,6 +14,7 @@ export class ClassroomsListComponent implements OnInit {
 
   @Output("onSelectClassroom") selectedClassroom: EventEmitter<Classe> = new EventEmitter();
   @Output("onSelectGlobalPlanning") selectAllClassrooms: EventEmitter<any> = new EventEmitter();
+  @Output("onSelectDepartmentPlanning") selectedDepartment: EventEmitter<Departement> = new EventEmitter();
   @Output("onSelectSectorPlanning") selectedSector: EventEmitter<Filiere> = new EventEmitter();
   @Output("onLoadedEnd") hasUploadedFile: EventEmitter<boolean | null> = new EventEmitter();
   @Input("load") canLoadClassrooms: boolean = true;
@@ -24,6 +26,7 @@ export class ClassroomsListComponent implements OnInit {
   classroomsList: Classe[] = [];
   prefferdSectorId: string = "-1";
   prefferdLevelId: string = "-1";
+  prefferedDepartmentId: string = "-1";
 
   constructor(
     private facultyService: FacultyService,
@@ -84,11 +87,38 @@ export class ClassroomsListComponent implements OnInit {
     }
   }
 
+  getDepartmentName(dept: Departement)
+  {
+    return this.translationService.getCurrentLang() === "fr" ? dept.nom : dept.nom_en;
+  }
+
+  onDepartmentChange()
+  {
+    this.prefferdSectorId = "-1";
+    this.filter();
+  }
+
+  onSectorChange()
+  {
+    let temp = this.sectors.find(elt => elt.id === parseInt(this.prefferdSectorId));
+
+    if(temp)
+    {
+      this.prefferedDepartmentId = ""+temp.departementId;
+    }
+    else{
+      this.prefferdSectorId = "-1";
+      this.prefferedDepartmentId = "-1";
+    }
+    this.filter();
+  }
+
   filter()
   {
     this.classroomsList = this.classrooms;
     const sectorId = parseInt(this.prefferdSectorId);
     const levelId = parseInt(this.prefferdLevelId);
+    const departmentId = parseInt(this.prefferedDepartmentId);
     if(this.searchText !== "")
     {
       this.classroomsList = this.classroomsList
@@ -99,6 +129,10 @@ export class ClassroomsListComponent implements OnInit {
             (classroom.intitule_en && classroom.intitule_en.toLowerCase().includes(this.searchText.toLowerCase()))
           );
         })
+    }
+    if(departmentId !== -1)
+    {
+      this.classroomsList = this.facultyService.getADepartmentClassrooms(departmentId);
     }
     if(levelId !== -1)
     {
@@ -130,12 +164,17 @@ export class ClassroomsListComponent implements OnInit {
 
   get sectors()
   {
-    return this.facultyService.facultySectors;
+    return (this.prefferedDepartmentId !== "-1") ? this.facultyService.getADepartmentSectors(parseInt(this.prefferedDepartmentId)) : this.facultyService.facultySectors;
   }
 
   get levels()
   {
     return this.facultyService.facultyLevels;
+  }
+
+  get departments()
+  {
+    return this.facultyService.facultyDepartments;
   }
 
   getClassroomGroupsNumber(classroomId: any)
@@ -145,7 +184,12 @@ export class ClassroomsListComponent implements OnInit {
 
   get showGlobalPlanningItem()
   {
-    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId === "-1";
+    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId === "-1" && this.prefferedDepartmentId === "-1";
+  }
+
+  get showDepartmentPlanningItem()
+  {
+    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId === "-1" && this.prefferedDepartmentId !== "-1";
   }
 
   get showSectorPlanningItem()
@@ -153,7 +197,7 @@ export class ClassroomsListComponent implements OnInit {
     return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId !== "-1";
   }
 
-  getPreferredSectorCode()
+  get preferredSectorCode()
   {
     let sectorId = parseInt(this.prefferdSectorId);
 
@@ -166,9 +210,31 @@ export class ClassroomsListComponent implements OnInit {
     }
   }
 
-  onAllClassroomsClick()
+  get preferredDepartmentName()
+  {
+    let deptId = parseInt(this.prefferedDepartmentId);
+
+    if(deptId !== -1)
+    {
+      let temp = this.departments.find(elt => elt.id === deptId);
+
+      return this.translationService.getCurrentLang() === "fr" ? temp?.nom : temp?.nom_en;
+    }
+    else{
+      return null;
+    }
+  }
+
+  onGlobalPlanningClick()
   {
     this.selectAllClassrooms.emit();
+  }
+
+  onDepartmentPlanningClick()
+  {
+    let departmentId = parseInt(this.prefferedDepartmentId);
+    let department: any = this.departments.find(elt => elt.id === departmentId);
+    this.selectedDepartment.emit(department);
   }
 
   onSectorPlanningClick()

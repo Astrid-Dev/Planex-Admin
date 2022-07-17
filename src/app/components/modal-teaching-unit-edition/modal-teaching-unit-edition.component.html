@@ -1,0 +1,101 @@
+<ngx-smart-modal #teachingUnitEditionModal identifier="teachingUnitEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALTEACHINGUNITEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editTeachingUnitForm" class="row" *ngIf="editTeachingUnitForm">
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.CODE.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHINGUNITEDITION.CODE.PLACEHOLDER' | translate}}" formControlName="code"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.code.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.CODE.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.CLASSROOM.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="classroom">
+            <option selected hidden disabled>{{'MODALTEACHINGUNITEDITION.CLASSROOM.PLACEHOLDER' | translate}}</option>
+            <option [value]="classroom.id" *ngFor="let classroom of classrooms">{{classroom.code}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.classroom.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.CLASSROOM.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.ENTITLED.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHINGUNITEDITION.ENTITLED.PLACEHOLDER' | translate}}" formControlName="entitled"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.ENTITLED.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.ENTITLED2.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHINGUNITEDITION.ENTITLED2.PLACEHOLDER' | translate}}" formControlName="entitled_en"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled_en.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.ENTITLED2.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.DOMAIN.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="domain">
+            <option selected hidden disabled>{{'MODALTEACHINGUNITEDITION.DOMAIN.PLACEHOLDER' | translate}}</option>
+            <option [value]="domain.id" *ngFor="let domain of domains">{{getDomaineName(domain)}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.domain.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.DOMAIN.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.SEMESTER.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="semester">
+            <option selected hidden disabled>{{'MODALTEACHINGUNITEDITION.SEMESTER.PLACEHOLDER' | translate}}</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.semester.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.SEMESTER.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.HOURS.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" placeholder="{{'MODALTEACHINGUNITEDITION.HOURS.PLACEHOLDER' | translate}}" formControlName="hours"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.hours.errors?.required">
+            {{'MODALTEACHINGUNITEDITION.HOURS.REQUIRED' | translate}}
+          </span>
+          <span class="text-danger" *ngIf="isSubmitted && (errorControl.hours.errors?.min || errorControl.hours.errors?.max)">
+            {{'MODALTEACHINGUNITEDITION.HOURS.INTERVAL' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHINGUNITEDITION.OPTIONAL.LABEL' | translate}}</label>
+          <select class="form-control" formControlName="optional">
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </select>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

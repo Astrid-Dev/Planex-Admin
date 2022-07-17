@@ -36,7 +36,8 @@ export interface PlanningCours {
   groupeCours?: GroupeCours | null,
   periode?: Periode,
   jour?: Jour,
-  anneeScolaire?: number | null
+  anneeScolaire?: number | null,
+  en_parallele_avec?: number | null
 }
 
 export interface PlanningCoursCreation{

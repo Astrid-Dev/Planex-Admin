@@ -1,10 +1,14 @@
+import {Departement} from "./Departement";
+
 export interface Filiere {
   id?: number,
   code: string,
   intitule: string,
   intitule_en: string,
-  faculteId: number,
+  departementId?: number | null,
+  departement?: Departement | string,
   createdAt?: string,
   updatedAt?: string,
-  typeHoraireId?: number | null
+  typeHoraireId?: number | null,
+  defaultDepartement?: string
 }

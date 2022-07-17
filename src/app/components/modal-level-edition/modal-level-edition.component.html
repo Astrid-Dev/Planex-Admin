@@ -1,0 +1,43 @@
+<ngx-smart-modal #levelEditionModal identifier="levelEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALLEVELEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editLevelForm" class="row" *ngIf="editLevelForm">
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALLEVELEDITION.CODE.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALLEVELEDITION.CODE.PLACEHOLDER' | translate}}" formControlName="code"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.code.errors?.required">
+            {{'MODALLEVELEDITION.CODE.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALLEVELEDITION.ENTITLED.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALLEVELEDITION.ENTITLED.PLACEHOLDER' | translate}}" formControlName="entitled"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled.errors?.required">
+            {{'MODALLEVELEDITION.ENTITLED.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALLEVELEDITION.ENTITLED2.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALLEVELEDITION.ENTITLED2.PLACEHOLDER' | translate}}" formControlName="entitled_en"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled_en.errors?.required">
+            {{'MODALLEVELEDITION.ENTITLED2.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

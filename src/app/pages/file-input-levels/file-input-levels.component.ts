@@ -1,17 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import Swal from "sweetalert2";
 import {LevelsService} from "../../services/levels.service";
 import {Niveau} from "../../models/Niveau";
 import {FacultyService} from "../../services/faculty.service";
+import {NgxSmartModalService} from "ngx-smart-modal";
+
+const MODAL_ID = "levelEditionModal";
 
 @Component({
   selector: 'app-file-input-levels',
   templateUrl: './file-input-levels.component.html',
   styleUrls: ['./file-input-levels.component.scss']
 })
-export class FileInputLevelsComponent implements OnInit {
+export class FileInputLevelsComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -24,27 +27,34 @@ export class FileInputLevelsComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  modal: any = null;
+
   constructor(
     private translationService: TranslationService,
     private levelsService: LevelsService,
-    private facultyService: FacultyService
+    private facultyService: FacultyService,
+    private ngxSmartModalService: NgxSmartModalService
   ) { }
 
   ngOnInit(): void {
 
     this.loadDatas();
 
-    this.pageTitle = "FILESINPUT.LEVELS.TITLE"
+    this.pageTitle = "FILESINPUT.DEPARTMENTS.TITLE"
     this.breadcumbs.push(
       {
         linkName: "SIDEMENU.INPUTFILES.TITLE",
         link: "files-input"
       },
       {
-        linkName: "SIDEMENU.INPUTFILES.LEVELS",
+        linkName: "SIDEMENU.INPUTFILES.DEPARTMENTS",
         link: "files-input/levels"
       }
     )
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -145,5 +155,38 @@ export class FileInputLevelsComponent implements OnInit {
   get canShowImportedStatus()
   {
     return this.hasLoadedDatas && this.showImportedStatus;
+  }
+
+  onConsult()
+  {
+    this.levels = this.facultyService.facultyLevels;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
+  entitled(level: Niveau)
+  {
+    return this.translationService.getCurrentLang() === "fr" ? level.intitule : level.intitule_en;
+  }
+
+  onEditLevel(level: Niveau)
+  {
+    this.modal.setData(level, true);
+    this.modal.open();
   }
 }

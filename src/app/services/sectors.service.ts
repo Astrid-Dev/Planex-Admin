@@ -12,7 +12,7 @@ export class SectorsService {
 
   constructor(private http: HttpClient) { }
 
-  extractDataFromFile(buffer: string, facultyId: number = 1)
+  extractDataFromFile(buffer: string)
   {
     return new Promise<Filiere[]>((resolve, reject) =>{
       const datas = buffer.split("\n");
@@ -23,7 +23,7 @@ export class SectorsService {
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
-        if(numberOfLines !== 3 && numberOfLines !== 4)
+        if(numberOfLines !== 4 && numberOfLines !== 5)
         {
           reject("Fichier non conforme");
         }
@@ -37,7 +37,7 @@ export class SectorsService {
 
             let j = 0;
 
-            if(numberOfLines === 4)
+            if(numberOfLines === 5)
             {
               ++j;
             }
@@ -45,13 +45,14 @@ export class SectorsService {
             const code = line[j].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim().toUpperCase();
             const intitule = line[j+1].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
             const intitule_en = line[j+2].replace("\r", "").replace("\t", "").replace("\"", "").replace("£", ",").trim();
+            const department = line[j+3].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
 
             const newFiliere:Filiere = {
               id: i,
               code: code,
               intitule: intitule,
               intitule_en: intitule_en !== "" ? intitule_en : intitule,
-              faculteId: facultyId
+              departement: department
             }
 
             result.push(newFiliere);

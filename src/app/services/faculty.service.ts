@@ -11,9 +11,12 @@ import {Periode, TypeHoraire} from "../models/TypeHoraire";
 import {Faculte} from "../models/Faculte";
 import {Td} from "../models/Td";
 import {DonneeEtudiant} from "../models/Etudiant";
-import {GroupeCours} from "../models/GroupeCours";
+import {CourseGroupCreation, GroupeCours} from "../models/GroupeCours";
 import {GroupeTd} from "../models/GroupeTd";
 import {Domaine, DomaineEnseignant} from "../models/Domaine";
+import {RepartitionCours} from "../models/RepartitionCours";
+import {Departement} from "../models/Departement";
+import {HelpService} from "./help.service";
 
 export const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
@@ -24,6 +27,7 @@ const FACULTY_URL = BACKEND_URL + "/facultes";
 })
 export class FacultyService {
 
+  departments: Departement[] = [];
   sectors: Filiere[] = [];
   levels: Niveau[] = [];
   teachingUnits: Ue[] = [];
@@ -36,6 +40,7 @@ export class FacultyService {
   studentsDatas: DonneeEtudiant[] = [];
   domains: Domaine[] = [];
   teachersDomains: DomaineEnseignant[] = [];
+  coursesRepartition: RepartitionCours[] = [];
   times: TypeHoraire[] = [];
   days: { numero: number, id?: number, intitule: string, intitule_en: string}[] = [];
   faculty !: Faculte;
@@ -44,7 +49,9 @@ export class FacultyService {
 
   hasLoadedDatas: boolean = false;
 
-  constructor(private http: HttpClient) { }
+  undefinedPeriods: any = [{id: null, debut: "", debut_en: "", fin: "", fin_en: ""}, {id: null, debut: "", debut_en: "", fin: "", fin_en: ""}, {id: null, debut: "", debut_en: "", fin: "", fin_en: ""}, {id: null, debut: "", debut_en: "", fin: "", fin_en: ""}];
+
+  constructor(private http: HttpClient, private helpService: HelpService) { }
 
   findOneFacultyWithSubsDatas(id: number)
   {
@@ -52,6 +59,7 @@ export class FacultyService {
       this.http.get(FACULTY_URL + "/"+ id + "/withsubsdatas")
         .subscribe(
           (res: any) =>{
+            this.departments = res.departements;
             this.sectors = res.filieres;
             this.levels = res.niveaux;
             this.teachingUnits = res.ues;
@@ -69,6 +77,7 @@ export class FacultyService {
             this.domains = res.domaines;
             this.teachersDomains = res.domaines_enseignants;
             this.academicYear = res.annee_scolaire;
+            this.coursesRepartition = res.repartition_cours;
 
             this.attributeStudentsNumberToCoursesGroups();
 
@@ -109,6 +118,15 @@ export class FacultyService {
     this.sectors = newSectors;
   }
 
+  get facultyDepartments()
+  {
+    return this.departments.sort((a, b) =>a.nom.localeCompare(b.nom));
+  }
+  setFacultyDepartments(newDepartments: Departement[])
+  {
+    this.departments = newDepartments;
+  }
+
   get facultyTeachers()
   {
     return this.teachers.sort((a, b) => a.noms.localeCompare(b.noms));
@@ -130,6 +148,11 @@ export class FacultyService {
   get facultyTeachersDomains()
   {
     return this.teachersDomains;
+  }
+
+  getATeacherDomains(teacherId: number)
+  {
+    return this.teachersDomains.filter(elt => elt.enseignantId === teacherId);
   }
 
   setFacultyTeachersDomains(newTeachersDomains: DomaineEnseignant[]){
@@ -157,6 +180,15 @@ export class FacultyService {
   setFacultyRooms(newRooms: Salle[])
   {
     this.rooms = newRooms;
+  }
+
+  get facultyCoursesRepartition(){
+    return this.coursesRepartition;
+  }
+
+  setFacultyCoursesRepartition(newCoursesRepartition: RepartitionCours[])
+  {
+    this.coursesRepartition = newCoursesRepartition;
   }
 
   get facultyClassrooms()
@@ -198,6 +230,11 @@ export class FacultyService {
   get facultyTimes()
   {
     return this.times;
+  }
+
+  get defaultFacultyTimeType()
+  {
+    return this.times.length > 0 ? this.times[0] : {id: null, pause: 0, periodes: this.undefinedPeriods, faculteId: this.faculty.id};
   }
 
   get allPeriods()
@@ -265,7 +302,7 @@ export class FacultyService {
     return this.studentsDatas.filter(studentData => studentData.classeId === classroomId);
   }
 
-  getAClassroomStudentsNumber(classroomId: number)
+  getAClassroomStudentsNumber(classroomId: any)
   {
     let temp = this.getAClassroomInfos(classroomId);
     let studentsNumber = 0;
@@ -293,12 +330,24 @@ export class FacultyService {
     return studentsNumber;
   }
 
-  getCoursesGroupsOfOneClassroom(classroomId: number)
+  getATeachingUnitCourseRepartition(teachingUnitId: any)
+  {
+    return this.coursesRepartition.find(elt => elt.ueId === teachingUnitId);
+  }
+
+  getAClassroomCoursesRepartition(classroomId: any)
+  {
+    let result: RepartitionCours[] = [];
+    let teachingUnitsId = this.getTeachingUnitsOfOneClassroom(classroomId).map(elt => elt.id);
+    return this.coursesRepartition.filter(elt => elt.ueId && teachingUnitsId.includes(elt.ueId));
+  }
+
+  getCoursesGroupsOfOneClassroom(classroomId: any)
   {
     return this.coursesGroups.filter((group => group.classeId === classroomId));
   }
 
-  setCoursesGroupsOfOneClassroom(classroomId: number, newGroups: GroupeCours[], newClassroomData: any = null)
+  setCoursesGroupsOfOneClassroom(classroomId: any, newGroups: GroupeCours[], newClassroomData: any = null)
   {
     this.coursesGroups = this.coursesGroups.filter(group => group.classeId !== classroomId);
     newGroups.forEach((group) =>{
@@ -392,5 +441,230 @@ export class FacultyService {
     return this.tutorialsGroups.filter(tutorialGroup => tutorialsList.includes(tutorialGroup.id));
   }
 
+  getASectorClassrooms(sectorId: any)
+  {
+    return this.classrooms.filter(elt => elt.filiereId === sectorId);
+  }
+
+  getADepartmentSectors(deptId: any)
+  {
+    return this.sectors.filter(elt => elt.departementId === deptId);
+  }
+
+  getADepartmentClassrooms(deptId: any)
+  {
+    let result: Classe[] = [];
+    this.getADepartmentSectors(deptId).forEach((sector) =>{
+      result = result.concat(this.getASectorClassrooms(sector.id));
+    });
+    return result;
+  }
+
+  proposeDivisionOfAClassroomInGroup(classroomId: any, groupsNumber: number = 2)
+  {
+    let coursesGroups: GroupeCours[] = [];
+    let coursesGroupsDuringCreation: CourseGroupCreation[] = [];
+    if(groupsNumber >= 2)
+    {
+      let classroom = this.classrooms.find(elt => elt.id === classroomId);
+
+      for(let i = 0; i < groupsNumber; i++)
+      {
+        coursesGroupsDuringCreation.push({
+          classeId: classroomId,
+          name: "",
+          startLetter: "",
+          endLetter: "",
+          possiblesEndLetters: [],
+          possiblesStartLetters: [],
+          studentsNumber: 0
+        });
+      }
+      coursesGroupsDuringCreation = this.syncGroupsLetters(coursesGroupsDuringCreation);
+      coursesGroupsDuringCreation = this.syncStudentsNumberPerGroup(classroomId, coursesGroupsDuringCreation);
+    }
+
+    return coursesGroupsDuringCreation;
+  }
+
+  proposeAClassroomDivisionToFitARoomCapacity(classroomId: any, roomCapacity: number = this.maxRoomCapacity)
+  {
+    let groupsNumber = 2;
+    let groups: CourseGroupCreation[] = [];
+    let maxStudentsNumber = this.getAClassroomStudentsNumber(classroomId);
+
+    while(maxStudentsNumber > roomCapacity){
+      groups = this.proposeDivisionOfAClassroomInGroup(classroomId, groupsNumber);
+      ++groupsNumber;
+      let studentsGroupsNumber = groups.map(elt => {return elt.studentsNumber});
+      maxStudentsNumber = Math.max(...studentsGroupsNumber);
+    }
+
+    let canContinue = true;
+
+    while(canContinue)
+    {
+      let foundIndex = 0;
+      let hasFound = false;
+
+      for(let i = 0; i < groups.length - 1; i++)
+      {
+        if((groups[i].studentsNumber + groups[i+1].studentsNumber) < roomCapacity)
+        {
+          foundIndex = i;
+          hasFound = true;
+          break;
+        }
+      }
+
+      if(hasFound)
+      {
+        console.log("Ok")
+        groups[foundIndex] = {
+          ...groups[foundIndex],
+          name: "Grp" + (foundIndex + 1),
+          studentsNumber: (groups[foundIndex].studentsNumber + groups[foundIndex + 1].studentsNumber),
+          endLetter: groups[foundIndex + 1].endLetter
+        }
+
+        groups = groups.filter((elt, index) => index !== (foundIndex + 1));
+      }
+
+      canContinue = hasFound;
+    }
+
+    return groups;
+  }
+
+  divideAClassroomToFitARoomCapacity(classroomId: any, roomCapacity: number = this.maxRoomCapacity)
+  {
+    let groupsCreation = this.proposeAClassroomDivisionToFitARoomCapacity(classroomId, roomCapacity);
+    let groups: GroupeCours[] = [];
+    let temp = this.getMaxCoursesGroupId();
+    console.log(groupsCreation)
+
+    groupsCreation.forEach((elt) =>{
+      temp = temp + 1;
+      groups.push({
+        lettre_fin: elt.startLetter,
+        nom: elt.name,
+        lettre_debut: elt.endLetter,
+        nbre_etudiants: elt.studentsNumber,
+        classeId: classroomId,
+        id: temp,
+      });
+    });
+
+    let classroom = this.classrooms.find(elt => elt.id === classroomId);
+    if(classroom)
+    {
+      classroom = {
+        ...classroom,
+        est_divisee: 1
+      }
+    }
+
+    this.setCoursesGroupsOfOneClassroom(classroomId, groups, classroom)
+  }
+
+  getMaxCoursesGroupId()
+  {
+    if(this.coursesGroups.length === 0){
+      return 0;
+    }
+    return Math.max(...this.coursesGroups.map(elt => {
+      let id: any = elt.id ? elt.id : 0;
+      return id;
+    }))
+  }
+
+  syncStudentsNumberPerGroup(classroomId: any, groupsData: CourseGroupCreation[])
+  {
+    let groups = groupsData.filter(elt => true);
+    groups.forEach((group: any) =>{
+      let temp = this.getAClassroomInfos(classroomId).filter((data) => data.lettre.toUpperCase().localeCompare(group.startLetter) >= 0 && data.lettre.toUpperCase().localeCompare(group.endLetter) <= 0)
+      let studentsNumber = 0;
+
+      temp.forEach((tmp: any) =>{
+        studentsNumber += tmp.nbre;
+      });
+
+      group.studentsNumber = studentsNumber;
+    });
+
+    return groups;
+  }
+
+  syncGroupsLetters(groupsData: CourseGroupCreation[])
+  {
+    let groups = groupsData.filter(elt => true);
+    const groupsNumber: number = groups.length;
+
+    let startIndex: number = -1;
+    let endIndex: number = -1;
+
+    const lettersNumber: number = parseInt(String(this.letters.length/groupsNumber));
+
+    groups.forEach((group, i: number) =>{
+      startIndex = endIndex + 1;
+      endIndex = startIndex + lettersNumber - 1;
+      if(i === 0)
+      {
+        endIndex += this.letters.length - (groupsNumber * lettersNumber);
+      }
+
+      group.name = "Grp" + (i + 1);
+      group.startLetter = this.letters[startIndex];
+      group.endLetter = this.letters[endIndex];
+    });
+
+    return groups;
+  }
+
+  syncPossiblesGroupsLetters(groupsData: CourseGroupCreation[])
+  {
+    let groups = groupsData.filter(elt => true);
+    groups[0].possiblesStartLetters = [this.letters[0]];
+    groups[groups.length - 1].possiblesEndLetters = [this.letters[this.letters.length - 1]];
+
+    for(let i = 1; i < groups.length; i++)
+    {
+      let letter1: string = groups[i-1].endLetter;
+      let letter2: string = groups[i].endLetter;
+
+      groups[i].possiblesStartLetters = this.getLettersInInterval(letter1, letter2, false, true);
+    }
+    for(let i = 0; i < groups.length - 1; i++)
+    {
+      let letter1: string = groups[i].startLetter;
+      let letter2: string = groups[i+1].startLetter;
+
+      groups[i].possiblesEndLetters = this.getLettersInInterval(letter1, letter2, true, false);
+    }
+
+    let firstGroup = groups[0];
+    let secondGroup = groups[1];
+
+    let lastGroup = groups[groups.length - 1];
+    let prevLastGroup = groups[groups.length - 2]
+    groups[0].possiblesEndLetters = this.getLettersInInterval(firstGroup.startLetter, secondGroup.startLetter, true, false);
+    groups[groups.length - 1].possiblesStartLetters = this.getLettersInInterval(prevLastGroup.endLetter, lastGroup.endLetter, false, true);
+    return groups;
+  }
+
+  private get letters()
+  {
+    return this.helpService.upperCasesLetters;
+  }
+
+  private getLettersInInterval(letter1: string, letter2: string, firstInside: boolean = false, lastInside: boolean = false)
+  {
+    return this.helpService.getLettersInInterval(letter1, letter2, firstInside, lastInside);
+  }
+
+  get maxRoomCapacity()
+  {
+    return this.rooms.length > 0 ? Math.max(...this.rooms.map(elt => elt.capacite)) : 0;
+  }
 
 }

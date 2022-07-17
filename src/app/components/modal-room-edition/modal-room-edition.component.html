@@ -1,0 +1,52 @@
+<ngx-smart-modal #roomEditionModal identifier="roomEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALROOMEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editRoomForm" class="row" *ngIf="editRoomForm">
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALROOMEDITION.CODE.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALROOMEDITION.CODE.PLACEHOLDER' | translate}}" formControlName="code"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.code.errors?.required">
+            {{'MODALROOMEDITION.CODE.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALROOMEDITION.CAPACITY.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALROOMEDITION.CAPACITY.PLACEHOLDER' | translate}}" formControlName="capacity"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.capacity.errors?.required">
+            {{'MODALROOMEDITION.CAPACITY.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALROOMEDITION.CAPACITYEXAM.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALROOMEDITION.CAPACITYEXAM.PLACEHOLDER' | translate}}" formControlName="capacity_exam"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.capacity_exam.errors?.required">
+            {{'MODALROOMEDITION.CAPACITYEXAM.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALROOMEDITION.CAPACITYBARR.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALROOMEDITION.CAPACITYBARR.PLACEHOLDER' | translate}}" formControlName="capacity_barr"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.capacity.errors?.required">
+            {{'MODALROOMEDITION.CAPACITYBARR.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

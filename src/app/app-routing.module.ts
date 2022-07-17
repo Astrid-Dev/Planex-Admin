@@ -17,6 +17,8 @@ import {PlanningCoursesComponent} from "./pages/planning-courses/planning-course
 import {PlanningsComponent} from "./pages/plannings/plannings.component";
 import {FileInputTimesRangesComponent} from "./pages/file-input-times-ranges/file-input-times-ranges.component";
 import {FileInputDomainsComponent} from "./pages/file-input-domains/file-input-domains.component";
+import {FileInputCoursesRepartitionComponent} from "./pages/file-input-courses-repartition/file-input-courses-repartition.component";
+import {FileInputDepartmentsComponent} from "./pages/file-input-departments/file-input-departments.component";
 
 const routes: Routes = [
   {
@@ -68,12 +70,20 @@ const routes: Routes = [
         component: FileInputTeachingUnitsComponent
       },
       {
+        path: "courses-repartition",
+        component: FileInputCoursesRepartitionComponent
+      },
+      {
         path: "times-ranges",
         component: FileInputTimesRangesComponent
       },
       {
         path: "domains",
         component: FileInputDomainsComponent
+      },
+      {
+        path: "departments",
+        component: FileInputDepartmentsComponent
       },
       {
         path: "**",

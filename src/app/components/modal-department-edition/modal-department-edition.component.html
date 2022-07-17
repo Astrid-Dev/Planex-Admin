@@ -1,0 +1,34 @@
+<ngx-smart-modal #departmentEditionModal identifier="departmentEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALDEPARTMENTEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editDepartmentForm" class="row" *ngIf="editDepartmentForm">
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALDEPARTMENTEDITION.NAME.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALDEPARTMENTEDITION.NAME.PLACEHOLDER' | translate}}" formControlName="name"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.name.errors?.required">
+            {{'MODALDEPARTMENTEDITION.NAME.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALDEPARTMENTEDITION.NAME2.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALDEPARTMENTEDITION.NAME2.PLACEHOLDER' | translate}}" formControlName="name_en"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.name_en.errors?.required">
+            {{'MODALDEPARTMENTEDITION.NAME2.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

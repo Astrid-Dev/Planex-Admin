@@ -1,0 +1,175 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas">
+            <div class="card-block" *ngIf="canUploadFile && !hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{(hasAlreadyUploadedData ? 'FILESINPUT.FILEIMPORT.IMPORTED' : 'FILESINPUT.FILEIMPORT.UNIMPORTED') | translate}}</mark></h5>
+              <div class="center flex-column" *ngIf="canShowImportedStatus">
+                <img src="assets/images/saved-data.jpg"/>
+                <div class="mt-2">
+                  <button class="btn btn-outline-amber mr-2" (click)="onConsult()">{{'SUBMITS.CONSULT' | translate}}</button>
+                  <button class="btn btn-outline-danger" (click)="onComplement()">{{'SUBMITS.COMPLEMENT' | translate}}</button>
+                </div>
+              </div>
+
+              <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+
+              <div *ngIf="canShowDataList">
+                <i (click)="onCancelConsult()" class="fa fa-close text-danger cursor-pointer"></i>
+                <div class="table-responsive">
+                  <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                      <th>N°</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.CLASSROOM' | translate}}</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.TEACHINGUNIT' | translate}}</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}1</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}2</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}3</th>
+                      <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}4</th>
+                      <th>{{'GLOBAL.EDIT' | translate}}</th>
+                      <th>{{'GLOBAL.DELETE' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let courseR of coursesRepartition; index as i">
+                      <td>{{(i+1)}}</td>
+                      <td>{{getClassroomByATeachingUnitId(courseR.ueId)?.code}}</td>
+                      <td>{{teachingUnit(courseR.ueId)}}</td>
+                      <td>{{teacher(courseR.enseignant1Id)}}</td>
+                      <td>{{teacher(courseR.enseignant2Id)}}</td>
+                      <td>{{teacher(courseR.enseignant3Id)}}</td>
+                      <td>{{teacher(courseR.enseignant4Id)}}</td>
+                      <td><i (click)="onEditCourseRepartition(courseR)" class="fa fa-edit text-primary cursor-pointer"></i></td>
+                      <td><i class="fa fa-close text-danger cursor-pointer"></i></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div class="required-file-importation center flex-column" *ngIf="!canUploadFile">
+              <img width="250px" height="250px" src="assets/images/required.jpg"/>
+              <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+            </div>
+
+            <div class="card-block" *ngIf="hasFoundBadsDatas">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.INCOHERENTDATASLIST' | translate}}</h5>
+
+              <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                  <thead>
+                  <tr>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.CLASSROOM' | translate}}</th>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.TEACHINGUNIT' | translate}}</th>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}1</th>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}2</th>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}3</th>
+                    <th>{{'FILESINPUT.COURSESREPARTITION.TEACHER' | translate}}4</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr *ngFor="let courseR of badsCoursesRepartition">
+                    <td class="width-200" *ngIf="!courseR.classeId">
+                      <select [(ngModel)]="courseR.classe" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultClasse">{{courseR.defaultClasse}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let classroom of classrooms" [value]="classroom.code">{{classroom.code}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="courseR.classeId">{{courseR.classe}}</td>
+
+                    <td class="width-200" *ngIf="courseR.ueId === null">
+                      <select [(ngModel)]="courseR.ue" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultUe">{{courseR.defaultUe}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let teachingUnit of getAclassroomTeachingUnits(courseR.classe)" [value]="teachingUnit.code">{{teachingUnit.code}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="courseR.ueId !== null">{{teachingUnit(courseR.ueId)}}</td>
+
+                    <td class="width-200" *ngIf="!courseR.enseignant1Id">
+                      <select [(ngModel)]="courseR.enseignant1" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultEnseignant1">{{courseR.defaultEnseignant1}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let teacher of teachers" [value]="teacher.noms">{{teacher.noms}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="courseR.enseignant1Id">{{teacher(courseR.enseignant1Id)}}</td>
+
+                    <td class="width-200" *ngIf="!dataIsSet(courseR.enseignant2Id)">
+                      <select [(ngModel)]="courseR.enseignant2" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultEnseignant2">{{courseR.defaultEnseignant2}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let teacher of teachers" [value]="teacher.noms">{{teacher.noms}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="dataIsSet(courseR.enseignant2Id)">{{teacher(courseR.enseignant2Id)}}</td>
+
+                    <td class="width-200" *ngIf="!dataIsSet(courseR.enseignant3Id)">
+                      <select [(ngModel)]="courseR.enseignant3" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultEnseignant3">{{courseR.defaultEnseignant3}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let teacher of teachers" [value]="teacher.noms">{{teacher.noms}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="dataIsSet(courseR.enseignant3Id)">{{teacher(courseR.enseignant3Id)}}</td>
+
+                    <td class="width-200" *ngIf="!dataIsSet(courseR.enseignant4Id)">
+                      <select [(ngModel)]="courseR.enseignant4" class="select2-theme form-control" >
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.DEFAULTVALUE' | translate">
+                          <option [value]="courseR.defaultEnseignant4">{{courseR.defaultEnseignant4}}</option>
+                        </optgroup>
+                        <optgroup [label]="'FILESINPUT.COURSESREPARTITION.POSSIBLEVALUES' | translate">
+                          <option *ngFor="let teacher of teachers" [value]="teacher.noms">{{teacher.noms}}</option>
+                        </optgroup>
+                      </select>
+                    </td>
+                    <td class="width-200" *ngIf="dataIsSet(courseR.enseignant4Id)">{{teacher(courseR.enseignant4Id)}}</td>
+                  </tr>
+                  </tbody>
+                </table>
+
+                <div class="mt-2 center">
+                  <button (click)="continueReading()" class="btn btn-primary">{{'FILESINPUT.FILEIMPORT.CONTINUE' | translate}}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page-loader" *ngIf="hasLoadedDatas === null">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+            <img src="assets/images/loading-error2.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="loadDatas()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-modal-course-repartition-edition></app-modal-course-repartition-edition>
+

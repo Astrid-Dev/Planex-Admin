@@ -1,0 +1,99 @@
+<ngx-smart-modal #teacherEditionModal identifier="teacherEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALTEACHEREDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editTeacherForm" class="row" *ngIf="editTeacherForm">
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.NAMES.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.NAMES.PLACEHOLDER' | translate}}" formControlName="names"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.names.errors?.required">
+            {{'MODALTEACHEREDITION.NAMES.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.SEX.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="sex">
+            <option value="" hidden selected disabled>{{'MODALTEACHEREDITION.SEX.PLACEHOLDER' | translate}}</option>
+            <option value="1">{{'GLOBAL.MALE2' | translate}}</option>
+            <option value="2">{{'GLOBAL.FEMALE2' | translate}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.sex.errors?.required">
+            {{'MODALTEACHEREDITION.SEX.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.EMAIL.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="email" class="form-control" placeholder="{{'MODALTEACHEREDITION.EMAIL.PLACEHOLDER' | translate}}" formControlName="email"/>
+        </fieldset>
+        <span class="text-danger" *ngIf="isSubmitted && errorControl.email.errors?.required">
+            {{'MODALTEACHEREDITION.EMAIL.REQUIRED' | translate}}
+        </span>
+        <span class="text-danger" *ngIf="isSubmitted && errorControl.email.errors?.email">
+            {{'MODALTEACHEREDITION.EMAIL.INVALID' | translate}}
+        </span>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.PHONENUMBER.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.PHONENUMBER.PLACEHOLDER' | translate}}" formControlName="phoneNumber"/>
+        </fieldset>
+        <span class="text-danger" *ngIf="isSubmitted && errorControl.phoneNumber.errors?.required">
+            {{'MODALTEACHEREDITION.PHONENUMBER.REQUIRED' | translate}}
+        </span>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.OFFICE.LABEL' | translate}}</label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.OFFICE.PLACEHOLDER' | translate}}" formControlName="office"/>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.ESTABLISHMENT.LABEL' | translate}}</label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.ESTABLISHMENT.PLACEHOLDER' | translate}}" formControlName="establishment"/>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.GRADE.LABEL' | translate}}</label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.GRADE.PLACEHOLDER' | translate}}" formControlName="grade"/>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.POSITION.LABEL' | translate}}</label>
+          <input type="text" class="form-control" placeholder="{{'MODALTEACHEREDITION.POSITION.PLACEHOLDER' | translate}}" formControlName="position"/>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row">
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALTEACHEREDITION.DOMAINS.LABEL' | translate}}</label>
+          <ng-multiselect-dropdown
+            placeholder="{{'MODALTEACHEREDITION.DOMAINS.PLACEHOLDER' | translate}}"
+            [settings]="dropdownSettings"
+            [data]="domainsList"
+            [(ngModel)]="selectedDomains"
+            (onSelect)="onDomainSelect($event)"
+            (onSelectAll)="onSelectAllDomains($event)"
+          >
+          </ng-multiselect-dropdown>
+        </fieldset>
+      </div>
+    </div>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

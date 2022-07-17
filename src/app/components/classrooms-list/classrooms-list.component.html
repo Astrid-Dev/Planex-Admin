@@ -5,7 +5,11 @@
     <div class="form-group col-md-6 col-sm-12">
       <i class="fa fa-search"></i>
       <div class="flex-row">
-        <select [(ngModel)]="prefferdSectorId" (ngModelChange)="filter()" class="form-control">
+        <select [(ngModel)]="prefferedDepartmentId" (ngModelChange)="onDepartmentChange()" class="form-control">
+          <option value="{{-1}}">{{'CLASSROOMSLIST.ALLDEPARTMENTS' | translate}}</option>
+          <option *ngFor="let dept of departments" [value]="dept.id">{{getDepartmentName(dept)}}</option>
+        </select>
+        <select [(ngModel)]="prefferdSectorId" (ngModelChange)="onSectorChange()" class="form-control">
           <option value="-1">{{'CLASSROOMSLIST.ALLSECTORS' | translate}}</option>
           <option *ngFor="let sector of sectors" [value]="sector.id">{{sector.code}}</option>
         </select>
@@ -19,16 +23,22 @@
   </div>
 
   <div class="list-contain" *ngIf="classroomsList.length > 0">
-    <div (click)="onAllClassroomsClick()" class="classroom-item all-classrooms cursor-pointer flex-column center" *ngIf="showGlobalPlanningItem">
+    <div (click)="onGlobalPlanningClick()" class="classroom-item all-classrooms cursor-pointer flex-column center" *ngIf="showGlobalPlanningItem">
       <h5>{{'PLANNINGS.GLOBALPLANNING' | translate}}</h5>
       <div class="text-italic">
         <span class="classroom-mini-info">{{'PLANNINGS.GLOBALPLANNINGDESCRIP' | translate}}</span>
       </div>
     </div>
-    <div (click)="onSectorPlanningClick()" class="classroom-item one-sector cursor-pointer flex-column center" *ngIf="showSectorPlanningItem">
-      <h5>{{'PLANNINGS.SECTORPLANNING' | translate}} {{getPreferredSectorCode()}}</h5>
+    <div (click)="onDepartmentPlanningClick()" class="classroom-item one-department cursor-pointer flex-column center" *ngIf="showDepartmentPlanningItem">
+      <h5>{{'PLANNINGS.DEPARTMENTPLANNING' | translate}} {{preferredDepartmentName}}</h5>
       <div class="text-italic">
-        <span class="classroom-mini-info">{{'PLANNINGS.SECTORPLANNINGDESCRIP' | translate}} {{getPreferredSectorCode()}}</span>
+        <span class="classroom-mini-info">{{'PLANNINGS.DEPARTMENTPLANNINGDESCRIP' | translate}}</span>
+      </div>
+    </div>
+    <div (click)="onSectorPlanningClick()" class="classroom-item one-sector cursor-pointer flex-column center" *ngIf="showSectorPlanningItem">
+      <h5>{{'PLANNINGS.SECTORPLANNING' | translate}} {{preferredSectorCode}}</h5>
+      <div class="text-italic">
+        <span class="classroom-mini-info">{{'PLANNINGS.SECTORPLANNINGDESCRIP' | translate}} {{preferredSectorCode}}</span>
       </div>
     </div>
     <div (click)="onChooseClassroom(classroom)" class="classroom-item cursor-pointer flex-column center" [title]="getClassroomEntitled(classroom)" *ngFor="let classroom of classroomsList;">

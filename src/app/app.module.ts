@@ -5,6 +5,9 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxSmartModalModule } from 'ngx-smart-modal';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import {NgMultiSelectDropDownModule} from "ng-multiselect-dropdown";
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -23,7 +26,6 @@ import { FileInputClassroomsComponent } from './pages/file-input-classrooms/file
 import { FileInputStudentsComponent } from './pages/file-input-students/file-input-students.component';
 import { FilesInputComponent } from './pages/files-input/files-input.component';
 import { FileInputLevelsComponent } from './pages/file-input-levels/file-input-levels.component';
-import {FormsModule} from "@angular/forms";
 import { DndDirective } from './directives/dnd.directive';
 import { ProgressComponent } from './components/progress/progress.component';
 import { ConfigurationTimesComponent } from './pages/configuration-times/configuration-times.component';
@@ -41,6 +43,17 @@ import { MultiCoursesTimeTableComponent } from './components/multi-courses-time-
 import { FileInputDomainsComponent } from './pages/file-input-domains/file-input-domains.component';
 import { FileInputTimesRangesComponent } from './pages/file-input-times-ranges/file-input-times-ranges.component';
 import { PlanningTutorialsComponent } from './pages/planning-tutorials/planning-tutorials.component';
+import { FileInputCoursesRepartitionComponent } from './pages/file-input-courses-repartition/file-input-courses-repartition.component';
+import { ModalTeacherEditionComponent } from './components/modal-teacher-edition/modal-teacher-edition.component';
+import { ModalRoomEditionComponent } from './components/modal-room-edition/modal-room-edition.component';
+import { ModalLevelEditionComponent } from './components/modal-level-edition/modal-level-edition.component';
+import { ModalClassroomEditionComponent } from './components/modal-classroom-edition/modal-classroom-edition.component';
+import { ModalTeachingUnitEditionComponent } from './components/modal-teaching-unit-edition/modal-teaching-unit-edition.component';
+import { ModalCourseRepartitionEditionComponent } from './components/modal-course-repartition-edition/modal-course-repartition-edition.component';
+import { FileInputDepartmentsComponent } from './pages/file-input-departments/file-input-departments.component';
+import { ModalDepartmentEditionComponent } from './components/modal-department-edition/modal-department-edition.component';
+import { ModalSectorEditionComponent } from './components/modal-sector-edition/modal-sector-edition.component';
+import { ModalCoursesPlanningGenerationComponent } from './components/modal-courses-planning-generation/modal-courses-planning-generation.component';
 
 // Factory function required during AOT compilation
 export function httpTranslateLoaderFactory(http: HttpClient) {
@@ -81,12 +94,24 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
     MultiCoursesTimeTableComponent,
     FileInputDomainsComponent,
     FileInputTimesRangesComponent,
-    PlanningTutorialsComponent
+    PlanningTutorialsComponent,
+    FileInputCoursesRepartitionComponent,
+    ModalTeacherEditionComponent,
+    ModalRoomEditionComponent,
+    ModalLevelEditionComponent,
+    ModalClassroomEditionComponent,
+    ModalTeachingUnitEditionComponent,
+    ModalCourseRepartitionEditionComponent,
+    FileInputDepartmentsComponent,
+    ModalDepartmentEditionComponent,
+    ModalSectorEditionComponent,
+    ModalCoursesPlanningGenerationComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
+    NgxPaginationModule,
     TranslateModule.forChild(),
     TranslateModule.forRoot({
       loader: {
@@ -96,7 +121,9 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
       }
     }),
     FormsModule,
+    ReactiveFormsModule,
     NgxSmartModalModule.forRoot(),
+    NgMultiSelectDropDownModule.forRoot(),
     AutocompleteLibModule
   ],
   providers: [],

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {TranslationService} from "../../services/translation.service";
 import Swal from "sweetalert2";
@@ -6,14 +6,16 @@ import {ClassroomsService} from "../../services/classrooms.service";
 import {FacultyService} from "../../services/faculty.service";
 import {Classe} from "../../models/Classe";
 import deleteProperty = Reflect.deleteProperty;
-import {Niveau} from "../../models/Niveau";
+import {NgxSmartModalService} from "ngx-smart-modal";
+
+const MODAL_ID = "classroomEditionModal";
 
 @Component({
   selector: 'app-file-input-classrooms',
   templateUrl: './file-input-classrooms.component.html',
   styleUrls: ['./file-input-classrooms.component.scss']
 })
-export class FileInputClassroomsComponent implements OnInit {
+export class FileInputClassroomsComponent implements OnInit, AfterViewInit {
 
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
@@ -29,10 +31,13 @@ export class FileInputClassroomsComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  modal: any = null;
+
   constructor(
     private translationService: TranslationService,
     private classroomsService: ClassroomsService,
-    private facultyService: FacultyService
+    private facultyService: FacultyService,
+    private ngxSmartModalService: NgxSmartModalService,
   ) { }
 
   ngOnInit(): void {
@@ -50,6 +55,10 @@ export class FileInputClassroomsComponent implements OnInit {
         link: "files-input/classrooms"
       }
     );
+  }
+
+  ngAfterViewInit() {
+    this.modal = this.ngxSmartModalService.getModal(MODAL_ID);
   }
 
   loadDatas()
@@ -99,15 +108,15 @@ export class FileInputClassroomsComponent implements OnInit {
     this.classrooms.forEach((classroom) =>{
       if((typeof classroom.filiereId === "undefined" || classroom.filiereId === null) || (typeof classroom.niveauId === "undefined" || classroom.niveauId === null))
       {
-        let sectors = this.getSectors().filter((a) => {return a.code === classroom.filiere});
-        let levels = this.getLevels().filter((a) =>{return a.code === classroom.niveau});
+        let sector = this.sectors.find((a) => {return a.code === classroom.filiere});
+        let level = this.levels.find((a) =>{return a.code === classroom.niveau});
 
-        if(sectors.length > 0 && levels.length > 0)
+        if(sector && level)
         {
           let temp: Classe = {
             ...classroom,
-            filiereId: sectors[0].id,
-            niveauId: levels[0].id
+            filiereId: sector.id,
+            niveauId: level.id
           }
 
           deleteProperty(temp, "filiere");
@@ -119,8 +128,8 @@ export class FileInputClassroomsComponent implements OnInit {
         {
           let temp: Classe = {
             ...classroom,
-            filiereId: sectors.length > 0 ? sectors[0].id: null,
-            niveauId: levels.length > 0 ? levels[0].id : null
+            filiereId: sector ? sector.id: null,
+            niveauId: level ? level.id : null
           }
 
           if(temp.filiereId === null)
@@ -143,8 +152,8 @@ export class FileInputClassroomsComponent implements OnInit {
     });
 
     this.badsClassrooms.forEach((classroom) =>{
-      let sector = this.getSectors().find((a) => {return a.code === classroom.filiere});
-      let level = this.getLevels().find((a) =>{return a.code === classroom.niveau});
+      let sector = this.sectors.find((a) => {return a.code === classroom.filiere});
+      let level = this.levels.find((a) =>{return a.code === classroom.niveau});
 
       if(sector && level)
       {
@@ -214,6 +223,7 @@ export class FileInputClassroomsComponent implements OnInit {
     this.classroomsService.createClassrooms(this.classrooms)
       .then((classrooms: Classe[] | any) =>{
         this.facultyService.setFacultyClassrooms(classrooms);
+        this.classrooms = classrooms;
         this.showImportedStatus = true;
         this.showDataList = false;
         this.showFileImport = false;
@@ -272,14 +282,60 @@ export class FileInputClassroomsComponent implements OnInit {
 
   }
 
-  getSectors()
+  get sectors()
   {
     return this.facultyService.facultySectors;
   }
 
-  getLevels()
+  get levels()
   {
     return this.facultyService.facultyLevels;
+  }
+
+  onConsult()
+  {
+    this.classrooms = this.facultyService.facultyClassrooms;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
+  entitled(classroom: Classe)
+  {
+    return this.translationService.getCurrentLang() === "fr" ? classroom.intitule : classroom.intitule_en;
+  }
+
+  level(levelId: any)
+  {
+    return this.levels.find(elt => elt.id === levelId)?.code;
+  }
+
+  sector(sectorId: any){
+    return this.sectors.find(elt => elt.id === sectorId)?.code;
+  }
+
+  studentsNumber(classroomId: any){
+    return this.facultyService.getAClassroomStudentsNumber(classroomId);
+  }
+
+  onEditClassroom(classroom: Classe)
+  {
+    this.modal.setData(classroom, true);
+    this.modal.open();
   }
 
 }

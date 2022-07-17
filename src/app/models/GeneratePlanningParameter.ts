@@ -5,17 +5,20 @@ import {Domaine, DomaineEnseignant} from "./Domaine";
 import {GroupeCours} from "./GroupeCours";
 import {Salle} from "./Salle";
 import {Jour, Periode} from "./TypeHoraire";
+import {RepartitionCours} from "./RepartitionCours";
 
 export interface GeneratePlanningParameter {
   classroom: Classe,
-  teachers: Enseignant[],
-  teachersDomains: DomaineEnseignant[],
   teachingUnits: Ue[],
-  domains: Domaine[],
   coursesGroups: GroupeCours[],
   rooms: Salle[], days: Jour[],
   periods: Periode[],
   academicYearId: number,
   classroomStudentsNumber: number,
-  allPeriods: Periode[]
+  allPeriods: Periode[],
+  coursesRepartition: RepartitionCours[],
+  selectedDays: [],
+  teachingUnitsPerDay: number,
+  oneTeachingUnitPerWeek: number,
+  periodsBetweenTwoTeachingUnits: number
 }

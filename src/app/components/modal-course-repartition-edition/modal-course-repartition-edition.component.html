@@ -1,0 +1,79 @@
+<ngx-smart-modal #courseRepartitionEditionModal identifier="courseRepartitionEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALCOURSEREPARTITIONEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editcourseRepartionForm" class="row" *ngIf="editcourseRepartionForm">
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.CLASSROOM.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="classroom">
+            <option value="" selected hidden disabled>{{'MODALCLASSROOMEDITION.CLASSROOM.PLACEHOLDER' | translate}}</option>
+            <option [value]="classroom.id" *ngFor="let classroom of classrooms">{{classroom.code}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.classroom.errors?.required">
+            {{'MODALCOURSEREPARTITIONEDITION.CLASSROOM.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.TEACHINGUNIT.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="teaching_unit">
+            <option value="" selected hidden disabled>{{'MODALCOURSEREPARTITIONEDITION.TEACHINGUNIT.PLACEHOLDER' | translate}}</option>
+            <option [value]="teachingUnit.id" *ngFor="let teachingUnit of possiblesTeachingUnits">{{teachingUnit.code}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.teaching_unit.errors?.required">
+            {{'MODALCOURSEREPARTITIONEDITION.TEACHINGUNIT.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.TEACHER1.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="teacher1">
+            <option value="" selected hidden disabled>{{'MODALCOURSEREPARTITIONEDITION.TEACHER1.PLACEHOLDER' | translate}}</option>
+            <option [value]="teacher.id" *ngFor="let teacher of possiblesTeachers(1)">{{teacher.noms}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.teacher1.errors?.required">
+            {{'MODALCOURSEREPARTITIONEDITION.TEACHER1.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.TEACHER2.LABEL' | translate}}</label>
+          <select class="form-control" formControlName="teacher2">
+            <option value="" selected hidden disabled>{{'MODALCOURSEREPARTITIONEDITION.TEACHER2.PLACEHOLDER' | translate}}</option>
+            <option [value]="teacher.id" *ngFor="let teacher of possiblesTeachers(2)">{{teacher.noms}}</option>
+          </select>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.TEACHER3.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="teacher3">
+            <option value="" selected hidden disabled>{{'MODALCOURSEREPARTITIONEDITION.TEACHER3.PLACEHOLDER' | translate}}</option>
+            <option [value]="teacher.id" *ngFor="let teacher of possiblesTeachers(3)">{{teacher.noms}}</option>
+          </select>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCOURSEREPARTITIONEDITION.TEACHER4.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="teacher4">
+            <option value="" selected hidden disabled>{{'MODALCOURSEREPARTITIONEDITION.TEACHER4.PLACEHOLDER' | translate}}</option>
+            <option [value]="teacher.id" *ngFor="let teacher of possiblesTeachers(4)">{{teacher.noms}}</option>
+          </select>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

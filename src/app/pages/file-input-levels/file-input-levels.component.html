@@ -13,11 +13,37 @@
               <div class="center flex-column" *ngIf="canShowImportedStatus">
                 <img src="assets/images/saved-data.jpg"/>
                 <div class="mt-2">
-                  <button class="btn btn-outline-amber mr-2">Consulter</button>
-                  <button class="btn btn-outline-danger">Complémenter</button>
+                  <button class="btn btn-outline-amber mr-2" (click)="onConsult()">{{'SUBMITS.CONSULT' | translate}}</button>
+                  <button class="btn btn-outline-danger" (click)="onComplement()">{{'SUBMITS.COMPLEMENT' | translate}}</button>
                 </div>
               </div>
               <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+
+              <div *ngIf="canShowDataList">
+                <i (click)="onCancelConsult()" class="fa fa-close text-danger cursor-pointer"></i>
+                <div class="table-responsive">
+                  <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                      <th>N°</th>
+                      <th>{{'FILESINPUT.LEVELS.CODE' | translate}}</th>
+                      <th>{{'FILESINPUT.LEVELS.ENTITLED' | translate}}</th>
+                      <th>{{'GLOBAL.EDIT' | translate}}</th>
+                      <th>{{'GLOBAL.DELETE' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let level of levels; index as i">
+                      <td>{{(i+1)}}</td>
+                      <td>{{level.code}}</td>
+                      <td>{{entitled(level)}}</td>
+                      <td><i (click)="onEditLevel(level)" class="fa fa-edit text-primary cursor-pointer"></i></td>
+                      <td><i class="fa fa-close text-danger cursor-pointer"></i></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
           <div class="page-loader" *ngIf="hasLoadedDatas === null">
@@ -33,4 +59,5 @@
     </div>
   </div>
 </div>
+<app-modal-level-edition></app-modal-level-edition>
 

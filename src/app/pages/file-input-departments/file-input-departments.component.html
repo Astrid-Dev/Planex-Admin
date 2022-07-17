@@ -1,0 +1,61 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <div class="card-body collapse in" *ngIf="hasLoadedDatas === true">
+
+            <div class="card-block">
+              <h5 class="center mb-2">{{'FILESINPUT.FILEIMPORT.STATUS' | translate}} : &nbsp;<mark>{{(hasAlreadyUploadedData ? 'FILESINPUT.FILEIMPORT.IMPORTED' : 'FILESINPUT.FILEIMPORT.UNIMPORTED') | translate}}</mark></h5>
+              <div class="center flex-column" *ngIf="canShowImportedStatus">
+                <img src="assets/images/saved-data.jpg"/>
+                <div class="mt-2">
+                  <button class="btn btn-outline-amber mr-2" (click)="onConsult()">{{'SUBMITS.CONSULT' | translate}}</button>
+                  <button class="btn btn-outline-danger" (click)="onComplement()">{{'SUBMITS.COMPLEMENT' | translate}}</button>
+                </div>
+              </div>
+              <app-file-import *ngIf="canShowFileImport" (onExtract)="readFileContent($event)" [isImporting]="isImporting"></app-file-import>
+
+              <div *ngIf="canShowDataList">
+                <i (click)="onCancelConsult()" class="fa fa-close text-danger cursor-pointer"></i>
+                <div class="table-responsive">
+                  <table class="table table-bordered mb-0">
+                    <thead>
+                    <tr>
+                      <th>N°</th>
+                      <th>{{'FILESINPUT.DEPARTMENTS.NAME' | translate}}</th>
+                      <th>{{'GLOBAL.EDIT' | translate}}</th>
+                      <th>{{'GLOBAL.DELETE' | translate}}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let department of departments; index as i">
+                      <td>{{(i+1)}}</td>
+                      <td>{{name(department)}}</td>
+                      <td><i (click)="onEditDepartment(department)" class="fa fa-edit text-primary cursor-pointer"></i></td>
+                      <td><i class="fa fa-close text-danger cursor-pointer"></i></td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="page-loader" *ngIf="hasLoadedDatas === null">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatas === false">
+            <img src="assets/images/loading-error2.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="loadDatas()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-modal-department-edition></app-modal-department-edition>
+

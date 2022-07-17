@@ -1,0 +1,67 @@
+<ngx-smart-modal #classroomEditionModal identifier="classroomEditionModal">
+  <div *ngIf="hasData" style="min-width: 600px;">
+    <div class="card-header">
+      <div class="card-title">
+        <h3 style="text-transform: none">{{'MODALCLASSROOMEDITION.TITLE' | translate}}</h3>
+      </div>
+    </div>
+    <form [formGroup]="editClassroomForm" class="row" *ngIf="editClassroomForm">
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALCLASSROOMEDITION.CODE.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALCLASSROOMEDITION.CODE.PLACEHOLDER' | translate}}" formControlName="code"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.code.errors?.required">
+            {{'MODALCLASSROOMEDITION.CODE.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALCLASSROOMEDITION.ENTITLED.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALCLASSROOMEDITION.ENTITLED.PLACEHOLDER' | translate}}" formControlName="entitled"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled.errors?.required">
+            {{'MODALCLASSROOMEDITION.CAPACITY.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-12">
+        <fieldset class="form-group">
+          <label>{{'MODALCLASSROOMEDITION.ENTITLED2.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="{{'MODALCLASSROOMEDITION.ENTITLED2.PLACEHOLDER' | translate}}" formControlName="entitled_en"/>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.entitled_en.errors?.required">
+            {{'MODALCLASSROOMEDITION.ENTITLED2.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCLASSROOMEDITION.SECTOR.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="sector">
+            <option selected hidden disabled>{{'MODALCLASSROOMEDITION.SECTOR.PLACEHOLDER' | translate}}</option>
+            <option [value]="sector.id" *ngFor="let sector of sectors">{{sector.code}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.sector.errors?.required">
+            {{'MODALCLASSROOMEDITION.SECTOR.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+      <div class="col-md-6">
+        <fieldset class="form-group">
+          <label>{{'MODALCLASSROOMEDITION.LEVEL.LABEL' | translate}} <span class="text-danger">*</span></label>
+          <select class="form-control" formControlName="level">
+            <option selected hidden disabled>{{'MODALCLASSROOMEDITION.LEVEL.PLACEHOLDER' | translate}}</option>
+            <option [value]="level.id" *ngFor="let level of levels">{{level.code}}</option>
+          </select>
+          <span class="text-danger" *ngIf="isSubmitted && errorControl.level.errors?.required">
+            {{'MODALCLASSROOMEDITION.LEVEL.REQUIRED' | translate}}
+          </span>
+        </fieldset>
+      </div>
+    </form>
+    <div class="row mt-3 text-md-center">
+      <button class="btn btn-primary mr-1" (click)="onApply()">{{'SUBMITS.APPLY' | translate}}</button>
+      <button class="btn btn-secondary" (click)="close()">{{'SUBMITS.CANCEL' | translate}}</button>
+    </div>
+  </div>
+
+</ngx-smart-modal>

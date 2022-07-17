@@ -24,6 +24,9 @@ export class FileInputTimesRangesComponent implements OnInit {
   showFileImport: boolean = false;
   showImportedStatus: boolean = false;
 
+  periodsList: Periode[] = [];
+  timesList: TypeHoraire[] = [];
+
   constructor(
     private translationService: TranslationService,
     private timesRangesService: TimesRangesService,
@@ -161,5 +164,47 @@ export class FileInputTimesRangesComponent implements OnInit {
   {
     return this.hasLoadedDatas && this.showImportedStatus;
   }
+
+  get timeTypes()
+  {
+    return this.facultyService.facultyTimes;
+  }
+
+  printPeriod(period: any, field: string)
+  {
+    return this.translationService.getCurrentLang() == "fr" ? period[field] : period[field+"_en"];
+  }
+
+  get allTimeTypesPeriods()
+  {
+    let result: Periode[] = [];
+    this.timeTypes.forEach((elt) =>{result = result.concat(elt.periodes)});
+
+    return result;
+  }
+
+  onConsult()
+  {
+    this.timesList = this.timeTypes;
+    this.periodsList = this.allTimeTypesPeriods;
+    this.showDataList = true;
+    this.showFileImport = false;
+    this.showImportedStatus = false;
+  }
+
+  onCancelConsult()
+  {
+    this.showDataList = false;
+    this.showFileImport = false;
+    this.showImportedStatus = true;
+  }
+
+  onComplement()
+  {
+    this.showDataList = false;
+    this.showFileImport = true;
+    this.showImportedStatus = false;
+  }
+
 
 }
