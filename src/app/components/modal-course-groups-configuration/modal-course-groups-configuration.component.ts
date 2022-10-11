@@ -101,14 +101,14 @@ export class ModalCourseGroupsConfigurationComponent implements OnInit, AfterVie
     let groups = this.facultyService.getCoursesGroupsOfOneClassroom(this.classroom.id);
     if(hasDivided && groups.length === this.groups.length)
     {
-     for(let i = 0; i < this.groups.length; i++)
-     {
-       if(this.groups[i].startLetter !== groups[i].lettre_debut || this.groups[i].endLetter !== groups[i].lettre_fin)
-       {
-         hasUpdatedGroupsLetters = true;
-         break;
-       }
-     }
+      for(let i = 0; i < this.groups.length; i++)
+      {
+        if(this.groups[i].startLetter !== groups[i].lettre_debut || this.groups[i].endLetter !== groups[i].lettre_fin)
+        {
+          hasUpdatedGroupsLetters = true;
+          break;
+        }
+      }
     }
     else if(hasDivided && groups.length !== this.groups.length)
     {
@@ -239,22 +239,98 @@ export class ModalCourseGroupsConfigurationComponent implements OnInit, AfterVie
 
   syncStudentsNumberPerGroup()
   {
-    this.groups = this.facultyService.syncStudentsNumberPerGroup(this.classroom.id, this.groups);
+    this.groups.forEach((group: any) =>{
+      let temp = this.classroomStudentsDatas.filter((data) => data.lettre.toUpperCase().localeCompare(group.startLetter) >= 0 && data.lettre.toUpperCase().localeCompare(group.endLetter) <= 0)
+      let studentsNumber = 0;
+
+      temp.forEach((tmp: any) =>{
+        studentsNumber += tmp.nbre;
+      });
+
+      group.studentsNumber = studentsNumber;
+    });
   }
 
   syncGroupsLetters()
   {
-    this.groups = this.facultyService.syncGroupsLetters(this.groups);
+    const groupsNumber: number = this.groups.length;
+
+    let startIndex: number = -1;
+    let endIndex: number = -1;
+
+    const lettersNumber: number = parseInt(String(this.letters.length/groupsNumber));
+
+    this.groups.forEach((group, i: number) =>{
+      startIndex = endIndex + 1;
+      endIndex = startIndex + lettersNumber - 1;
+      if(i === 0)
+      {
+        endIndex += this.letters.length - (groupsNumber * lettersNumber);
+      }
+
+      group.name = this.translationService.getValueOf("CONFIGURATIONS.COURSESGROUPS.GROUP") + (i + 1);
+      group.startLetter = this.letters[startIndex];
+      group.endLetter = this.letters[endIndex];
+    });
   }
 
   syncPossiblesGroupsLetters()
   {
-    this.groups = this.facultyService.syncPossiblesGroupsLetters(this.groups);
+    this.groups[0].possiblesStartLetters = [this.letters[0]];
+    this.groups[this.groups.length - 1].possiblesEndLetters = [this.letters[this.letters.length - 1]];
+
+    for(let i = 1; i < this.groups.length; i++)
+    {
+      let letter1: string = this.groups[i-1].endLetter;
+      let letter2: string = this.groups[i].endLetter;
+
+      this.groups[i].possiblesStartLetters = this.getLettersInInterval(letter1, letter2, false, true);
+    }
+    for(let i = 0; i < this.groups.length - 1; i++)
+    {
+      let letter1: string = this.groups[i].startLetter;
+      let letter2: string = this.groups[i+1].startLetter;
+
+      this.groups[i].possiblesEndLetters = this.getLettersInInterval(letter1, letter2, true, false);
+    }
+
+    let firstGroup = this.groups[0];
+    let secondGroup = this.groups[1];
+
+    let lastGroup = this.groups[this.groups.length - 1];
+    let prevLastGroup = this.groups[this.groups.length - 2]
+    this.groups[0].possiblesEndLetters = this.getLettersInInterval(firstGroup.startLetter, secondGroup.startLetter, true, false);
+    this.groups[this.groups.length - 1].possiblesStartLetters = this.getLettersInInterval(prevLastGroup.endLetter, lastGroup.endLetter, false, true);
+  }
+
+  getLetterIndex(letter: string)
+  {
+    return this.letters.indexOf(letter);
   }
 
   getLettersInInterval(letter1: string, letter2: string, firstInside: boolean = false, lastInside: boolean = false)
   {
-    return this.helpService.getLettersInInterval(letter1, letter2, firstInside, lastInside);
+    let init = this.getLetterIndex(letter1) + 1;
+    let end = this.getLetterIndex(letter2);
+
+    if(firstInside)
+    {
+      --init;
+    }
+
+    if(lastInside)
+    {
+      ++end;
+    }
+
+    let result: any = [];
+
+    for(let i = init; i < end; i++)
+    {
+      result.push(this.letters[i]);
+    }
+
+    return result;
   }
 
   onStartGroupLetterChange(event: any, groupIndex: number)

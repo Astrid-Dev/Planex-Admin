@@ -3,7 +3,7 @@
   <h6 class="card-subtitle line-on-side text-muted text-xs-center font-small-3 pt-2 mb-2">
     <span>{{classroom.code}}</span>
   </h6>
-  <app-courses-time-table [classroom]="classroom.code" [showSaveButton]="false" [readOnly]="false"></app-courses-time-table>
+  <app-tutorials-time-table [classroom]="classroom.code" [showSaveButton]="false" [readOnly]="false"></app-tutorials-time-table>
   <h6 class="card-subtitle line-on-side text-muted text-xs-center font-small-3 pt-2 mt-2 mb-2">
     <button class="btn btn-primary" (click)="onSelectClassroom(classroom)">Modifier</button>
   </h6>
@@ -14,11 +14,10 @@
     <i class="fa fa-users"></i>
   </div>
   <div *ngIf="showDownloadsButtons" class="bg-gradient-directional-info flat-button" title="Exporter le planning des salles">
-    <i class="fa fa-home"></i>
+    <i class="fa fa-house"></i>
   </div>
-  <div *ngIf="showDownloadsButtons" (click)="exportAll()" class="bg-warning flat-button" title="Exporter tout le planning">
-    <i *ngIf="!isExporting" class="fa fa-database"></i>
-    <i *ngIf="isExporting" class="fa fa-spin fa-spinner"></i>
+  <div *ngIf="showDownloadsButtons" class="bg-warning flat-button" title="Exporter tout le planning">
+    <i class="fa fa-database"></i>
   </div>
   <div *ngIf="showDownloadsButtons" (click)="desactivateDownloadButtons()" class="bg-danger flat-button">
     <i class="fa fa-close"></i>
@@ -27,6 +26,7 @@
     <i class="fa fa-download"></i>
   </div>
   <div class="flat-button bg-primary">
-    <i class="fa fa-save"></i>
+    <i *ngIf="isExporting" class="fa fa-file-pdf-o"></i>
+    <i *ngIf="!isExporting" class="fa fa-save"></i>
   </div>
 </div>

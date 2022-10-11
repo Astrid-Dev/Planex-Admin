@@ -95,6 +95,19 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
 
     });
     this.modal.onAnyCloseEventFinished.subscribe((mountModal: NgxSmartModalComponent) =>{
+      this.daysChecksList = [];
+      this.departmentsChecksList = [];
+      this.sectorsChecksList = [];
+      this.levelsChecksList = [];
+
+      this.selectAllDays = true;
+      this.selectAllDepartments = true;
+      this.selectAllSectors = true;
+      this.selectAllLevels = true;
+
+      this.teachingUnitsPerDay = {min: 1, max: 3, value: 1};
+      this.oneTeachingUnitPerWeek = {min: 1, max: 3, value: 1};
+      this.periodsBetweenTwoTeachingUnits = {min: 0, max: 3, value: 0};
       this.modal.removeData();
     });
   }
@@ -130,7 +143,7 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
   {
     if(sectorId){
       let sector = this.facultyService.facultySectors.find(elt =>elt.id === sectorId);
-      return (sector && sector?.typeHoraireId) ? this.facultyService.facultyTimes.find(elt => elt.id === sector?.typeHoraireId) : this.facultyService.defaultFacultyTimeType.periodes;
+      return (sector && sector?.typeHoraireId) ? this.facultyService.facultyTimes.find(elt => elt.id === sector?.typeHoraireId)?.periodes : this.facultyService.defaultFacultyTimeType.periodes;
     }
     else{
       return this.facultyService.defaultFacultyTimeType.periodes;
@@ -392,6 +405,9 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
           selectedDays.push(elt.id)
         }
       })
+
+      console.log(this.days)
+      console.log(selectedDays);
       if(this.isForClassroom)
       {
         let temp: any = this.facultyService.facultyClassrooms.find(elt => elt.id === this.itemId);
@@ -430,7 +446,7 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
           let selectedLevelsId = this.levelsChecksList.map((elt) => {return elt.checked ? elt.id : null});
           selectedLevelsId = selectedLevelsId.filter(elt => elt);
 
-          classrooms = this.facultyService.facultyClassrooms.filter(elt => elt.niveauId && selectedLevelsId.includes(elt.niveauId));
+          classrooms = this.facultyService.facultyClassrooms.filter(elt => elt.filiereId === this.itemId && elt.niveauId && selectedLevelsId.includes(elt.niveauId));
         }
         else if(this.isForDepartment)
         {
@@ -458,6 +474,8 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
           }
 
           let classroom: any = this.facultyService.facultyClassrooms.find(cl => cl.id === elt.id);
+          console.log(elt.id);
+          console.log(classroom)
           options.push({
             days: this.days,
             teachingUnits: this.getAClassroomTeachingUnits(classroom?.id),
@@ -474,7 +492,6 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
             coursesGroups: this.facultyService.getCoursesGroupsOfOneClassroom(classroom?.id),
             coursesRepartition: this.facultyService.getAClassroomCoursesRepartition(classroom?.id)
           });
-
           this.planningCoursesService.generateAGroupOfClassroomsCoursesPlanning(options);
         })
       }

@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {NgxSmartModalComponent, NgxSmartModalService} from "ngx-smart-modal";
 import {PlanningCours} from "../../models/PlanningCours";
 import {TranslationService} from "../../services/translation.service";
@@ -48,6 +48,8 @@ export class ModalUpdatingCoursesPlanningComponent implements OnInit, AfterViewI
   @ViewChild('teacher2') teacher2Input: any;
   @ViewChild('teacher3') teacher3Input: any;
   @ViewChild('teacher4') teacher4Input: any;
+
+  @Input("type") type: number = 1;
 
   @Output("onModify") modifiedCeil: EventEmitter<PlanningCours> = new EventEmitter<PlanningCours>();
 
@@ -370,20 +372,26 @@ export class ModalUpdatingCoursesPlanningComponent implements OnInit, AfterViewI
   {
     this.onUnselectActivity();
     this.activities = [];
-    this.teachingUnits.forEach((teachingUnit: any) =>{
-      this.activities.push({
-        id: teachingUnit.id,
-        name: teachingUnit.code,
-        type: ActivityType.COURSE
+    if(this.type === 1)
+    {
+      this.teachingUnits.forEach((teachingUnit: any) =>{
+        this.activities.push({
+          id: teachingUnit.id,
+          name: teachingUnit.code,
+          type: ActivityType.COURSE
+        });
       });
-    });
-    this.tutorials.forEach((turorial: any) =>{
-      this.activities.push({
-        id: turorial.id,
-        name: turorial.code,
-        type: ActivityType.TUTORIAL
+    }
+    else{
+      this.tutorials.forEach((turorial: any) =>{
+        this.activities.push({
+          id: turorial.id,
+          name: turorial.code,
+          type: ActivityType.TUTORIAL
+        });
       });
-    });
+    }
+
     this.activities.sort((a, b) => a.name.localeCompare(b.name));
   }
 

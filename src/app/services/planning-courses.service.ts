@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import {BACKEND_URL} from "../../environments/environment";
 import {PlanningCours, PlanningCoursCreation} from "../models/PlanningCours";
 import {HttpClient} from "@angular/common/http";
 import {Ue} from "../models/Ue";
@@ -7,8 +6,9 @@ import {Jour, Periode} from "../models/TypeHoraire";
 import {Salle} from "../models/Salle";
 import {GeneratePlanningParameter} from "../models/GeneratePlanningParameter";
 import {FacultyService} from "./faculty.service";
+import {environment} from "../../environments/environment";
 
-const PLANNING_COURSES_URL = BACKEND_URL + "/planningCoursEtTds";
+const PLANNING_COURSES_URL = environment.BACKEND_URL + "/planningCoursEtTds";
 
 const MAX_ROOM_CAPACITY_ACCURACY = 0.59;
 
@@ -138,141 +138,160 @@ export class PlanningCoursesService {
     let academicYearId = parameter.academicYearId;
     let othersPlannings = this.plannings$.filter(elt => elt.classeId !== classroom?.id);
     let coursesRepartition = parameter.coursesRepartition;
-    let selectedDays = parameter.selectedDays;
+    let selectedDays: any = parameter.selectedDays;
     let teachingUnitsPerDay = parameter.teachingUnitsPerDay;
     let oneTeachingUnitPerWeek = parameter.oneTeachingUnitPerWeek;
     let periodsBetweenTwoTeachingUnits = parameter.periodsBetweenTwoTeachingUnits;
+    console.log("-------")
+    console.log(classroom);
+    console.log("------")
 
     let daysOccurences: number[] = [];
 
 
-    parameter.teachingUnits.forEach((elt) =>{
-      for(let i = 0; i < oneTeachingUnitPerWeek; i++)
-      {
-        teachingUnits.push(elt);
-      }
-    })
-
-    let classroomPlanning: PlanningCours[] = [];
-
-    let id = this.getMaxPlanningId();
-    periods.forEach((period, periodIndex) =>{
-      let periodId: any = period.id;
-      days.forEach((day, dayIndex) =>{
-        let dayId: any = day.id;
-        ++id;
-        classroomPlanning.push({
-          id: id,
-          classeId: classroom.id,
-          anneeScolaireId: academicYearId,
-          enseignant1Id: null,
-          enseignant2Id: null,
-          enseignant3Id: null,
-          enseignant4Id: null,
-          salleId: null,
-          groupeTdId: null,
-          groupeCoursId: null,
-          jourId: dayId,
-          periodeId: periodId,
-          tdId: null,
-          ueId: null
-        });
-      })
-    })
-
-
-
-    let planningIndexes = classroomPlanning.map((elt, index) => index);
-    let teachingUnitsIndexes = teachingUnits.map((elt, index) => index);
-
-    for(let i = 0; i < teachingUnits.length; i++)
+    if(classroom)
     {
-      if(planningIndexes.length > 1)
-      {
-        let randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
-        let randomPlanning = classroomPlanning[randomPlanningIndex];
-        planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
-
-        let randomTeachingUnitIndex = teachingUnitsIndexes[this.getRandomInt(0, teachingUnitsIndexes.length - 1)];
-        let randomTeachingUnit = teachingUnits[randomTeachingUnitIndex];
-        teachingUnitsIndexes = teachingUnitsIndexes.filter(elt => elt !== randomTeachingUnitIndex);
-
-        let courseRepartition = coursesRepartition.find(elt => elt.ueId === randomTeachingUnit.id);
-
-        let teachingUnit: Ue = teachingUnits[i];
-
-        let othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
-          if(((elt.jourId !== null && elt.
-            jourId === randomPlanning.jourId)))
-          {
-            return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
-          }
-          else
-          {
-            return false;
-          }
-        });
-
-
-        let teacher1Id: any = courseRepartition ? courseRepartition.enseignant1Id : null;
-        let teacher2Id: any = courseRepartition ? courseRepartition.enseignant2Id : null;
-        let teacher3Id: any = courseRepartition ? courseRepartition.enseignant3Id : null;
-        let teacher4Id: any = courseRepartition ? courseRepartition.enseignant4Id : null;
-        let teachingUnitId: any = randomTeachingUnit.id;
-        let occupatedRoomsAtThisTime: any = othersPlanningsAtThisTime.map(elt => elt.salleId);
-        let possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, parameter.classroomStudentsNumber);
-        let selectedRoomId: any = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
-
-        if(possiblesRooms.length === 0)
+      parameter.teachingUnits.forEach((elt) =>{
+        for(let i = 0; i < oneTeachingUnitPerWeek; i++)
         {
-          coursesGroups.forEach((courseGroup) =>{
-            console.log(randomPlanning)
-            othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
-              if(((elt.jourId !== null && elt.
-                jourId === randomPlanning.jourId)))
-              {
-                return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
-              }
-              else
-              {
-                return false;
-              }
-            });
-            occupatedRoomsAtThisTime = othersPlanningsAtThisTime.map(elt => elt.salleId);
-            possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, this.facultyService.getACourseGroupStudentsNumber(courseGroup));
-            selectedRoomId = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
-            let courseGroupId: any = courseGroup.id;
+          teachingUnits.push(elt);
+        }
+      })
 
+      let classroomPlanning: PlanningCours[] = [];
+
+      let id = this.getMaxPlanningId();
+      periods.forEach((period, periodIndex) =>{
+        let periodId: any = period.id;
+        days.forEach((day, dayIndex) =>{
+          let dayId: any = day.id;
+          ++id;
+          classroomPlanning.push({
+            id: id,
+            classeId: classroom.id,
+            anneeScolaireId: academicYearId,
+            enseignant1Id: null,
+            enseignant2Id: null,
+            enseignant3Id: null,
+            enseignant4Id: null,
+            salleId: null,
+            groupeTdId: null,
+            groupeCoursId: null,
+            jourId: dayId,
+            periodeId: periodId,
+            tdId: null,
+            ueId: null
+          });
+        })
+      })
+
+
+
+      let planningIndexes = classroomPlanning.map((elt, index) => index);
+      let teachingUnitsIndexes = teachingUnits.map((elt, index) => index);
+
+      for(let i = 0; i < teachingUnits.length; i++)
+      {
+        if(planningIndexes.length > 1)
+        {
+          let randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+          let randomPlanning = classroomPlanning[randomPlanningIndex];
+          planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+
+          while(planningIndexes.length > 0 && !selectedDays.includes(randomPlanning.jourId))
+          {
+            randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+            randomPlanning = classroomPlanning[randomPlanningIndex];
+            planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+          }
+
+          if(planningIndexes.length === 0){
+            break;
+          }
+
+          let randomTeachingUnitIndex = teachingUnitsIndexes[this.getRandomInt(0, teachingUnitsIndexes.length - 1)];
+          let randomTeachingUnit = teachingUnits[randomTeachingUnitIndex];
+          teachingUnitsIndexes = teachingUnitsIndexes.filter(elt => elt !== randomTeachingUnitIndex);
+
+          let courseRepartition = coursesRepartition.find(elt => elt.ueId === randomTeachingUnit.id);
+
+          let teachingUnit: Ue = teachingUnits[i];
+
+          let othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
+            if(((elt.jourId !== null && elt.
+              jourId === randomPlanning.jourId)))
+            {
+              return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
+            }
+            else
+            {
+              return false;
+            }
+          });
+
+
+          let teacher1Id: any = courseRepartition ? courseRepartition.enseignant1Id : null;
+          let teacher2Id: any = courseRepartition ? courseRepartition.enseignant2Id : null;
+          let teacher3Id: any = courseRepartition ? courseRepartition.enseignant3Id : null;
+          let teacher4Id: any = courseRepartition ? courseRepartition.enseignant4Id : null;
+          let teachingUnitId: any = randomTeachingUnit.id;
+          let occupatedRoomsAtThisTime: any = othersPlanningsAtThisTime.map(elt => elt.salleId);
+          let possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, parameter.classroomStudentsNumber);
+          let selectedRoomId: any = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
+
+          if(possiblesRooms.length === 0)
+          {
+            coursesGroups.forEach((courseGroup) =>{
+              othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
+                if(((elt.jourId !== null && elt.
+                  jourId === randomPlanning.jourId)))
+                {
+                  return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
+                }
+                else
+                {
+                  return false;
+                }
+              });
+              occupatedRoomsAtThisTime = othersPlanningsAtThisTime.map(elt => elt.salleId);
+              possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, this.facultyService.getACourseGroupStudentsNumber(courseGroup));
+              selectedRoomId = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
+              let courseGroupId: any = courseGroup.id;
+
+              randomPlanning.ueId = teachingUnitId;
+              randomPlanning.enseignant1Id = teacher1Id;
+              randomPlanning.enseignant2Id = teacher2Id;
+              randomPlanning.enseignant3Id = teacher3Id;
+              randomPlanning.enseignant4Id = teacher4Id;
+              randomPlanning.salleId = selectedRoomId;
+              randomPlanning.groupeCoursId = courseGroupId;
+
+              randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+              randomPlanning = classroomPlanning[randomPlanningIndex];
+              planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+            })
+          }
+          else{
             randomPlanning.ueId = teachingUnitId;
             randomPlanning.enseignant1Id = teacher1Id;
             randomPlanning.enseignant2Id = teacher2Id;
             randomPlanning.enseignant3Id = teacher3Id;
             randomPlanning.enseignant4Id = teacher4Id;
             randomPlanning.salleId = selectedRoomId;
-            randomPlanning.groupeCoursId = courseGroupId;
-
-            randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
-            randomPlanning = classroomPlanning[randomPlanningIndex];
-            planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
-          })
+          }
         }
         else{
-          randomPlanning.ueId = teachingUnitId;
-          randomPlanning.enseignant1Id = teacher1Id;
-          randomPlanning.enseignant2Id = teacher2Id;
-          randomPlanning.enseignant3Id = teacher3Id;
-          randomPlanning.enseignant4Id = teacher4Id;
-          randomPlanning.salleId = selectedRoomId;
+          break;
         }
-      }
-      else{
-        break;
+
       }
 
+      this.setAClassroomPlannings(classroomPlanning, classroom.id);
+      return classroomPlanning;
     }
-
-    this.setAClassroomPlannings(classroomPlanning, classroom.id);
-    return classroomPlanning;
+    else{
+      return [];
+    }
   }
 
   generateAGroupOfClassroomsCoursesPlanning(parameters: GeneratePlanningParameter[])

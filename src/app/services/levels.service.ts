@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {Niveau} from "../models/Niveau";
-import {BACKEND_URL} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
-const LEVELS_URL = BACKEND_URL + "/niveaux";
+const LEVELS_URL = environment.BACKEND_URL + "/niveaux";
 
 @Injectable({
   providedIn: 'root'

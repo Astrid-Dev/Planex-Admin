@@ -3,10 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  BACKEND_URL: "http://localhost:3100/api"
 };
 
-export const BACKEND_URL = "http://localhost:3100/api";
 
 /*
  * For easier debugging in development mode, you can import the following file

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Td} from "../models/Td";
-import {BACKEND_URL} from "../../environments/environment";
+import {environment} from "../../environments/environment";
 
-const TUTORIALS_URL = BACKEND_URL+"/tds";
+const TUTORIALS_URL = environment.BACKEND_URL+"/tds";
 
 @Injectable({
   providedIn: 'root'

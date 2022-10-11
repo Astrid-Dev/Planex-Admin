@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {RepartitionCours} from "../models/RepartitionCours";
-import {BACKEND_URL} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
+import {environment} from "../../environments/environment";
 
-const COURSES_REPARTITION_URL = BACKEND_URL + "/repartitionCours";
+const COURSES_REPARTITION_URL = environment.BACKEND_URL + "/repartitionCours";
 
 @Injectable({
   providedIn: 'root'

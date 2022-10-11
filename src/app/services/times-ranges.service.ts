@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 import {Niveau} from "../models/Niveau";
 import {Periode, TypeHoraire} from "../models/TypeHoraire";
 import {HttpClient} from "@angular/common/http";
-import {BACKEND_URL} from "../../environments/environment";
+import {environment} from "../../environments/environment";
 
-const PERIODS_URL = BACKEND_URL + "/types-horaires";
-const TIMESRANGE_URL = BACKEND_URL + "/typesHoraires";
+const PERIODS_URL = environment.BACKEND_URL + "/types-horaires";
+const TIMESRANGE_URL = environment.BACKEND_URL + "/typesHoraires";
 
 @Injectable({
   providedIn: 'root'

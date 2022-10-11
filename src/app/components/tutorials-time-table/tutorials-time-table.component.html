@@ -38,24 +38,21 @@
       <tr *ngFor="let period of periods; index as periodIndex;">
         <th>{{getTimeName(period, "debut") + " - " + getTimeName(period, "fin")}}</th>
         <td (mouseenter)="onMouseEnterCeilPlanning(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))" (mouseleave)="onMouseLeaveCeilPlanning(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))" [className]="readOnly ? '' : 'clickable'" *ngFor="let day2 of days; index as dayIndex;">
-            <div (click)="onCeilClick(dayIndex, periodIndex)">
-              <span class="text-bold-600 planning-activity">{{getPlanningActivityCodeAt(dayIndex, periodIndex)}}</span>
-              <span class="text-bold-600 planning-room">{{getPlanningRoomCodeAt(dayIndex, periodIndex).room}} <em *ngIf="getPlanningRoomCodeAt(dayIndex, periodIndex).hasGroup">{{getPlanningRoomCodeAt(dayIndex, periodIndex).group}}</em></span>
-              <span class="text-bold-600 planning-teacher1">{{getPlanningTeacherAt(dayIndex, periodIndex, 1)}}</span>
-              <span class="text-bold-600 planning-teacher2">{{getPlanningTeacherAt(dayIndex, periodIndex, 2)}}</span>
-              <span class="text-bold-600 planning-teacher3">{{getPlanningTeacherAt(dayIndex, periodIndex, 3)}}</span>
-              <span class="text-bold-600 planning-teacher4">{{getPlanningTeacherAt(dayIndex, periodIndex, 4)}}</span>
-            </div>
-            <div class="exchange-block"  *ngIf="!readOnly && canShowExchangeIcon(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))" (click)="onExchange(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))"><i [className]="exchangeIconClass(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))"></i></div>
+          <div (click)="onCeilClick(dayIndex, periodIndex)">
+            <span class="text-bold-600 planning-activity">{{getPlanningActivityCodeAt(dayIndex, periodIndex)}}</span>
+            <span class="text-bold-600 planning-room">{{getPlanningRoomCodeAt(dayIndex, periodIndex).room}} <em *ngIf="getPlanningRoomCodeAt(dayIndex, periodIndex).hasGroup">{{getPlanningRoomCodeAt(dayIndex, periodIndex).group}}</em></span>
+            <span class="text-bold-600 planning-teacher1">{{getPlanningTeacherAt(dayIndex, periodIndex, 1)}}</span>
+            <span class="text-bold-600 planning-teacher2">{{getPlanningTeacherAt(dayIndex, periodIndex, 2)}}</span>
+            <span class="text-bold-600 planning-teacher3">{{getPlanningTeacherAt(dayIndex, periodIndex, 3)}}</span>
+            <span class="text-bold-600 planning-teacher4">{{getPlanningTeacherAt(dayIndex, periodIndex, 4)}}</span>
+          </div>
+          <div class="exchange-block"  *ngIf="!readOnly && canShowExchangeIcon(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))" (click)="onExchange(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))"><i [className]="exchangeIconClass(getAPlanningCeilByDayAndPeriod(dayIndex, periodIndex))"></i></div>
         </td>
       </tr>
       </tbody>
     </table>
   </div>
   <div class="copyright"><span class="text-italic">&copy; {{currentYear}} Planex</span></div>
-  <div class="mt-1 center" *ngIf="coursesGroups.length > 0">
-    <div class="col-md-3" *ngFor="let group of coursesGroups">{{group.nom}} = {{group.lettre_debut}}-{{group.lettre_fin}}</div>
-  </div>
 </div>
 <div class="row text-md-center mt-3 mb-1" *ngIf="!readOnly && showSaveButton">
   <div *ngIf="isSaving">
@@ -66,4 +63,4 @@
   <button *ngIf="!isSaving" class="btn btn-danger" (click)="onExport()"><i class="fa fa-file-pdf-o"></i> {{'COURSESTIMETABLE.EXPORT' | translate}}</button>
 </div>
 <div *ngIf="!readOnly" style="color: white">.</div>
-<app-modal-updating-courses-planning *ngIf="!readOnly" (onModify)="updateACeil($event)"></app-modal-updating-courses-planning>
+<app-modal-updating-courses-planning [type]="2" *ngIf="!readOnly" (onModify)="updateACeil($event)"></app-modal-updating-courses-planning>

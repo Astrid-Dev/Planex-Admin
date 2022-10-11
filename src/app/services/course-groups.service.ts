@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {BACKEND_URL} from "../../environments/environment";
 import {GroupeCours} from "../models/GroupeCours";
+import {environment} from "../../environments/environment";
 
-const COURSE_GROUPS_URL = BACKEND_URL + "/groupesCours";
+const COURSE_GROUPS_URL = environment.BACKEND_URL + "/groupesCours";
 
 @Injectable({
   providedIn: 'root'

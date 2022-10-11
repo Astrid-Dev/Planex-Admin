@@ -1,23 +1,21 @@
-import {AfterViewInit, Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit} from '@angular/core';
+import {PlanningCours} from "../../models/PlanningCours";
 import {FacultyService} from "../../services/faculty.service";
 import {TranslationService} from "../../services/translation.service";
 import {PlanningCoursesService} from "../../services/planning-courses.service";
-import {PlanningCours} from "../../models/PlanningCours";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import Swal from "sweetalert2";
-import { jsPDF } from "jspdf";
-import html2canvas from 'html2canvas';
-import {GeneratePlanningParameter} from "../../models/GeneratePlanningParameter";
-import {Td} from "../../models/Td";
+import html2canvas from "html2canvas";
+import {jsPDF} from "jspdf";
 
 const MODAL_ID = "coursesPlanningModal";
 
 @Component({
-  selector: 'app-courses-time-table',
-  templateUrl: './courses-time-table.component.html',
-  styleUrls: ['./courses-time-table.component.scss']
+  selector: 'app-tutorials-time-table',
+  templateUrl: './tutorials-time-table.component.html',
+  styleUrls: ['./tutorials-time-table.component.scss']
 })
-export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
+export class TutorialsTimeTableComponent implements OnInit {
 
   currentYear = new Date().getFullYear();
 
@@ -79,8 +77,8 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
   {
     let sectorCode = this.classroom.sector?.code;
     return this.translationService.getCurrentLang() === "fr" ? (
-      this.translationService.getValueOf("COURSESTIMETABLE.SECTOR") + " " +sectorCode
-    )
+        this.translationService.getValueOf("COURSESTIMETABLE.SECTOR") + " " +sectorCode
+      )
       : (
         sectorCode+ " "+ this.translationService.getValueOf("COURSESTIMETABLE.SECTOR")
       )
@@ -110,8 +108,8 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
       .sort((a, b) => {
         let numero1 = a.numero === 0 ? 100 : a.numero;
         let numero2 = b.numero === 0 ? 100 : b.numero;
-      return numero1 - numero2
-    });
+        return numero1 - numero2
+      });
   }
 
   get defaultPlanning()
@@ -354,39 +352,30 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
   onSave()
   {
     let classroomId: any = this.classroom.infos?.id;
-    this.isSaving = true;
-    this.planningCoursesService.createPlanningsForAClassroom(this.plannings, classroomId)
-      .then((res) =>{
-        this.performSavingWithSuccess();
-      })
-      .catch((err) =>{
-        console.error(err);
-        this.performSavingWithError();
-      })
-    // if(this.isFirstTimePlanning)
-    // {
-    //   this.isSaving = true;
-    //   this.planningCoursesService.createPlanningsForAClassroom(this.plannings, classroomId)
-    //     .then((res) =>{
-    //       this.performSavingWithSuccess();
-    //     })
-    //     .catch((err) =>{
-    //       console.error(err);
-    //       this.performSavingWithError();
-    //     })
-    // }
-    // else if(this.planningsCeilsToUpdate.length > 0)
-    // {
-    //   this.isSaving = true;
-    //   this.planningCoursesService.updateAClassroomPlannings(this.planningsCeilsToUpdate, classroomId)
-    //     .then((res) =>{
-    //       this.performSavingWithSuccess();
-    //     })
-    //     .catch((err) =>{
-    //       console.error(err);
-    //       this.performSavingWithError();
-    //     })
-    // }
+    if(this.isFirstTimePlanning)
+    {
+      this.isSaving = true;
+      this.planningCoursesService.createPlanningsForAClassroom(this.plannings, classroomId)
+        .then((res) =>{
+          this.performSavingWithSuccess();
+        })
+        .catch((err) =>{
+          console.error(err);
+          this.performSavingWithError();
+        })
+    }
+    else if(this.planningsCeilsToUpdate.length > 0)
+    {
+      this.isSaving = true;
+      this.planningCoursesService.updateAClassroomPlannings(this.planningsCeilsToUpdate, classroomId)
+        .then((res) =>{
+          this.performSavingWithSuccess();
+        })
+        .catch((err) =>{
+          console.error(err);
+          this.performSavingWithError();
+        })
+    }
 
   }
 
@@ -494,4 +483,5 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
   {
     this.currentHoverItem = null;
   }
+
 }

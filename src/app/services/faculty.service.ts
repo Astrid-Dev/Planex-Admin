@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {BACKEND_URL} from "../../environments/environment";
 import {HttpClient} from "@angular/common/http";
 import {Filiere} from "../models/Filiere";
 import {Niveau} from "../models/Niveau";
@@ -17,10 +16,11 @@ import {Domaine, DomaineEnseignant} from "../models/Domaine";
 import {RepartitionCours} from "../models/RepartitionCours";
 import {Departement} from "../models/Departement";
 import {HelpService} from "./help.service";
+import {environment} from "../../environments/environment";
 
 export const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
-const FACULTY_URL = BACKEND_URL + "/facultes";
+const FACULTY_URL = environment.BACKEND_URL + "/facultes";
 
 @Injectable({
   providedIn: 'root'

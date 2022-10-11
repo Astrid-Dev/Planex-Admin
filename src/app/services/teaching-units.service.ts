@@ -2,14 +2,14 @@ import { Injectable } from '@angular/core';
 import {Ue} from "../models/Ue";
 import {Td} from "../models/Td";
 import {HttpClient} from "@angular/common/http";
-import {BACKEND_URL} from "../../environments/environment";
+import {environment} from "../../environments/environment";
 
 export interface TeachingUnitResult{
   teachingUnits: Ue[],
   tutorials: Td[]
 }
 
-const TEACHING_UNITS_URL = BACKEND_URL+"/ues"
+const TEACHING_UNITS_URL = environment.BACKEND_URL+"/ues"
 
 @Injectable({
   providedIn: 'root'

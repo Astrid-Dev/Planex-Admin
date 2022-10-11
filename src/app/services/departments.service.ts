@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {Departement} from "../models/Departement";
-import {BACKEND_URL} from "../../environments/environment";
+import {environment} from "../../environments/environment";
 
-const DEPARTMENTS_URL = BACKEND_URL + "/departements";
+const DEPARTMENTS_URL = environment.BACKEND_URL + "/departements";
 
 @Injectable({
   providedIn: 'root'

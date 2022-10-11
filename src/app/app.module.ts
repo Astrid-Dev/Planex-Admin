@@ -54,6 +54,8 @@ import { FileInputDepartmentsComponent } from './pages/file-input-departments/fi
 import { ModalDepartmentEditionComponent } from './components/modal-department-edition/modal-department-edition.component';
 import { ModalSectorEditionComponent } from './components/modal-sector-edition/modal-sector-edition.component';
 import { ModalCoursesPlanningGenerationComponent } from './components/modal-courses-planning-generation/modal-courses-planning-generation.component';
+import { TutorialsTimeTableComponent } from './components/tutorials-time-table/tutorials-time-table.component';
+import { MultiTutorialsTimeTableComponent } from './components/multi-tutorials-time-table/multi-tutorials-time-table.component';
 
 // Factory function required during AOT compilation
 export function httpTranslateLoaderFactory(http: HttpClient) {
@@ -105,7 +107,9 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
     FileInputDepartmentsComponent,
     ModalDepartmentEditionComponent,
     ModalSectorEditionComponent,
-    ModalCoursesPlanningGenerationComponent
+    ModalCoursesPlanningGenerationComponent,
+    TutorialsTimeTableComponent,
+    MultiTutorialsTimeTableComponent
   ],
   imports: [
     BrowserModule,

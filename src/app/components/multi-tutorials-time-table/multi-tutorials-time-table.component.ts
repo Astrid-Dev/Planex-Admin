@@ -1,18 +1,18 @@
 import {Component, Input, OnInit} from '@angular/core';
+import {ActionZone} from "../../models/ActionZone";
 import {FacultyService} from "../../services/faculty.service";
 import {TranslationService} from "../../services/translation.service";
-import html2canvas from "html2canvas";
-import {jsPDF} from "jspdf";
 import {Router} from "@angular/router";
+import {jsPDF} from "jspdf";
+import html2canvas from "html2canvas";
 import {Classe} from "../../models/Classe";
-import {ActionZone} from "../../models/ActionZone";
 
 @Component({
-  selector: 'app-multi-courses-time-table',
-  templateUrl: './multi-courses-time-table.component.html',
-  styleUrls: ['./multi-courses-time-table.component.scss']
+  selector: 'app-multi-tutorials-time-table',
+  templateUrl: './multi-tutorials-time-table.component.html',
+  styleUrls: ['./multi-tutorials-time-table.component.scss']
 })
-export class MultiCoursesTimeTableComponent implements OnInit {
+export class MultiTutorialsTimeTableComponent implements OnInit {
 
   @Input("filter") filter: {actionZone: ActionZone, itemId: any} = {actionZone: ActionZone.GLOBAL, itemId: null};
 
@@ -53,35 +53,41 @@ export class MultiCoursesTimeTableComponent implements OnInit {
     return this.facultyService.currentFaculty;
   }
 
-  exportAll()
+  async export()
   {
     this.isExporting = true;
-    console.log("okokoko")
+
     setTimeout(() =>{
       let pdf = new jsPDF('l', 'mm', 'a4'); // A4 size page of PDF
 
-      let fileName = "Planex_Course_Planning_of_"+this.faculty.nom + ".pdf";
+      let fileName = "Planex_Tutorials_Planning_of_"+this.faculty.nom + ".pdf";
 
-      let temp = this.classrooms.length > 2 ? 2 : this.classrooms.length;
+      let promises = this.classrooms.map((classroom, index) =>{
+        return new Promise((resolve, reject) =>{
+          let id = "courseTimeTable"+classroom.id;
+          html2canvas(<HTMLElement>document.getElementById(id)).then(canvas => {
+            // Few necessary setting options
 
-      for(let i = 0; i< temp; i++) {
-        console.log("77777")
-        let classroom = this.classrooms[i];
-        let id = "courseTimeTable" + classroom.id;
-        html2canvas(<HTMLElement>document.getElementById(id)).then(canvas => {
-          // Few necessary setting options
+            const contentDataURL = canvas.toDataURL('image/jpeg')
 
-          const contentDataURL = canvas.toDataURL('image/png')
+            let width = pdf.internal.pageSize.getWidth();
+            let height = canvas.height * width / canvas.width;
+            pdf.addImage(contentDataURL, 'JPEG', 0, 5, width, height);
+            pdf.addPage();
 
-          let width = pdf.internal.pageSize.getWidth();
-          let height = canvas.height * width / canvas.width;
-          pdf.addImage(contentDataURL, 'PNG', 0, 5, width, height);
-          pdf.addPage();
-        });
-      }
-      pdf.save(fileName);
-      this.isExporting = false;
+            resolve(true);
+          });
+        })
+      });
 
+      Promise.all(promises)
+        .then((res) =>{
+          pdf.save(fileName);
+          this.isExporting = false;
+        })
+        .catch((err) =>{
+          console.error(err);
+        })
     }, 200)
 
   }
@@ -89,7 +95,7 @@ export class MultiCoursesTimeTableComponent implements OnInit {
   onSelectClassroom(classroom: Classe)
   {
     //this.hasSelectedClassroom = true;
-    this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
+    this.router.navigate(["plannings/tutorials"], {queryParams: {classroom: classroom.code}});
   }
 
   activateDownloadButtons(){

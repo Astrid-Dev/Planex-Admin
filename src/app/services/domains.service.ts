@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import {Domaine} from "../models/Domaine";
 import {HttpClient} from "@angular/common/http";
-import {BACKEND_URL} from "../../environments/environment";
+import {environment} from "../../environments/environment";
 
-const DOMAINS_URL = BACKEND_URL + "/domaines";
+const DOMAINS_URL = environment.BACKEND_URL + "/domaines";
 
 @Injectable({
   providedIn: 'root'
