@@ -17,14 +17,16 @@ export class TimesRangesService {
   extractDataFromFile(buffer: string)
   {
     return new Promise<Periode[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Periode[] = [];
       let i = 1;
-
       if(datas.length > 1)
       {
         const entete = datas[0];
         const numberOfLines = entete.split(",").length;
+        console.log(numberOfLines);
         if(numberOfLines !== 2 && numberOfLines !== 3)
         {
           reject("Fichier non conforme");
@@ -36,29 +38,36 @@ export class TimesRangesService {
           while(i < datas.length)
           {
             const line = datas[i].split(",");
+            console.log(line);
 
-            let j = 0;
+            if(line.length > 0){
+              let j = 0;
 
-            if(numberOfLines === 3)
-            {
-              ++j;
+              if(numberOfLines === 3)
+              {
+                ++j;
+              }
+
+              console.log(line[j]);
+              console.log(line[j+1]);
+              console.log('-------------')
+
+              const debut = line[j].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+              const fin = line[j+1].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
+
+              const newNiveau:Periode = {
+                id: i,
+                debut: this.getTimeInFrench(debut),
+                fin: this.getTimeInFrench(fin),
+                debut_en: this.getTimeInEnglish(debut),
+                fin_en: this.getTimeInEnglish(fin)
+              }
+
+              result.push(newNiveau);
+              ++i;
             }
-
-            const debut = line[j].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-            const fin = line[j+1].replace("\r", "").replace("\"", "").replace("\t", "").replace("£", ",").trim();
-
-            const newNiveau:Periode = {
-              id: i,
-              debut: this.getTimeInFrench(debut),
-              fin: this.getTimeInFrench(fin),
-              debut_en: this.getTimeInEnglish(debut),
-              fin_en: this.getTimeInEnglish(fin)
-            }
-
-            result.push(newNiveau);
-            ++i;
           }
-
+          console.log(result)
           resolve(result);
 
         }

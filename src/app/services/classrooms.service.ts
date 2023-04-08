@@ -15,7 +15,9 @@ export class ClassroomsService {
   extractDataFromFile(buffer: string)
   {
     return new Promise<Classe[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Classe[] = [];
       let i = 1;
 

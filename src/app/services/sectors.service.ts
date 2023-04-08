@@ -15,7 +15,9 @@ export class SectorsService {
   extractDataFromFile(buffer: string)
   {
     return new Promise<Filiere[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Filiere[] = [];
       let i = 1;
 

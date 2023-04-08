@@ -15,7 +15,9 @@ export class StudentsService {
   extractDataFromFile(buffer: string)
   {
     return new Promise<Etudiant[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Etudiant[] = [];
       let i = 1;
 

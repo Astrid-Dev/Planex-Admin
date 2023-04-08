@@ -15,7 +15,11 @@ export class RoomsService {
   extractDataFromFile(buffer: string, facultyId: number = 1)
   {
     return new Promise<Salle[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        console.log(elt);
+        
+        return elt.split(",").length > 1;
+      });
       let result : Salle[] = [];
       let i = 1;
 

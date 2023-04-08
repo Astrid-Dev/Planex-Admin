@@ -15,7 +15,9 @@ export class CoursesRepartitionService {
   extractDataFromFile(buffer: string, academicYearId: any)
   {
     return new Promise<RepartitionCours[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : RepartitionCours[] = [];
       let i = 1;
 

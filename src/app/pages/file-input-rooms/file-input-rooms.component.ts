@@ -64,6 +64,7 @@ export class FileInputRoomsComponent implements OnInit, AfterViewInit {
     {
       this.facultyService.findOneFacultyWithSubsDatas(1)
         .then((res) =>{
+          console.log(res);
           this.hasLoadedDatas = true;
         })
         .catch((err) =>{

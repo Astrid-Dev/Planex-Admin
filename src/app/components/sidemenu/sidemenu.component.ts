@@ -99,12 +99,23 @@ export class SidemenuComponent implements OnInit {
               this.current_menu = 19;
               break;
             }
+            }
+            case "/plannings/exams" :{
+              this.current_menu = 20;
+              break;
+            }
 
           }
 
           if(url.includes("/plannings/courses"))
           {
             this.current_menu = 18;
+          }
+
+          if(url.includes("/plannings/tutorials"))
+          {
+            this.current_menu = 19;
+          }
           }
 
           if(url.includes("/plannings/tutorials"))

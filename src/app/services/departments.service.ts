@@ -15,7 +15,9 @@ export class DepartmentsService {
   extractDataFromFile(buffer: string, facultyId: number = 1)
   {
     return new Promise<Departement[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Departement[] = [];
       let i = 1;
 

@@ -15,7 +15,9 @@ export class LevelsService {
   extractDataFromFile(buffer: string, facultyId: number = 1)
   {
     return new Promise<Niveau[]>((resolve, reject) =>{
-      const datas = buffer.split("\n");
+      const datas = buffer.split("\n").filter(elt => {
+        return elt.split(",").length > 1;
+      });
       let result : Niveau[] = [];
       let i = 1;
 

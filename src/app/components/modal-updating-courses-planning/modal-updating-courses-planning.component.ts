@@ -6,8 +6,10 @@ import {Classe} from "../../models/Classe";
 import {PlanningCoursesService} from "../../services/planning-courses.service";
 
 const MODAL_ID = "coursesPlanningModal";
+const MODAL = "examsPlanningGenerationModal";
 
 const MAX_ROOM_CAPACITY_ACCURACY = 0.59;
+
 
 enum ActivityType{
   COURSE,
