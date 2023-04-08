@@ -99,7 +99,6 @@ export class SidemenuComponent implements OnInit {
               this.current_menu = 19;
               break;
             }
-            }
             case "/plannings/exams" :{
               this.current_menu = 20;
               break;
@@ -116,11 +115,9 @@ export class SidemenuComponent implements OnInit {
           {
             this.current_menu = 19;
           }
-          }
-
-          if(url.includes("/plannings/tutorials"))
+          if(url.includes("/plannings/exams"))
           {
-            this.current_menu = 19;
+            this.current_menu = 20;
           }
         }
       });
