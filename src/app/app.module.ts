@@ -57,6 +57,7 @@ import { ModalCoursesPlanningGenerationComponent } from './components/modal-cour
 import { TutorialsTimeTableComponent } from './components/tutorials-time-table/tutorials-time-table.component';
 import { MultiTutorialsTimeTableComponent } from './components/multi-tutorials-time-table/multi-tutorials-time-table.component';
 import { PlanningExamsComponent } from './pages/planning-exams/planning-exams.component';
+import { SurveillantComponent } from './surveillant/surveillant.component';
 
 // Factory function required during AOT compilation
 export function httpTranslateLoaderFactory(http: HttpClient) {
@@ -111,7 +112,8 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
     ModalCoursesPlanningGenerationComponent,
     TutorialsTimeTableComponent,
     MultiTutorialsTimeTableComponent,
-    PlanningExamsComponent
+    PlanningExamsComponent,
+    SurveillantComponent
   ],
   imports: [
     BrowserModule,

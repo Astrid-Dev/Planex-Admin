@@ -21,6 +21,7 @@ import {FileInputCoursesRepartitionComponent} from "./pages/file-input-courses-r
 import {FileInputDepartmentsComponent} from "./pages/file-input-departments/file-input-departments.component";
 import {PlanningTutorialsComponent} from "./pages/planning-tutorials/planning-tutorials.component";
 import { PlanningExamsComponent } from './pages/planning-exams/planning-exams.component';
+import { SurveillantComponent } from './surveillant/surveillant.component';
 
 const routes: Routes = [
   {
@@ -86,6 +87,10 @@ const routes: Routes = [
       {
         path: "departments",
         component: FileInputDepartmentsComponent
+      },
+      {
+        path: "supervisors",
+        component: SurveillantComponent
       },
       {
         path: "**",
