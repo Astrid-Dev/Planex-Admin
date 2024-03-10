@@ -223,7 +223,7 @@ export class PlanningCoursesComponent implements OnInit, AfterViewInit {
 
   get classrooms()
   {
-    return this.facultyService.classrooms;
+    return this.facultyService.facultyClassrooms;
   }
 
   get departments()

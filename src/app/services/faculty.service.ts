@@ -17,6 +17,8 @@ import {RepartitionCours} from "../models/RepartitionCours";
 import {Departement} from "../models/Departement";
 import {HelpService} from "./help.service";
 import {environment} from "../../environments/environment";
+import {Supervisor} from "../models/Supervisor";
+import {DataManagementService} from "./data-management.service";
 
 export const letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
@@ -34,6 +36,7 @@ export class FacultyService {
   classrooms: Classe[] = [];
   rooms: Salle[] = [];
   teachers: Enseignant[] = [];
+  supervisors: Supervisor[] = [];
   tutorials: Td[] = [];
   coursesGroups: GroupeCours[] = [];
   tutorialsGroups: GroupeTd[] = [];
@@ -65,7 +68,6 @@ export class FacultyService {
             this.teachingUnits = res.ues;
             this.tutorials = res.tds;
             this.rooms = res.salles;
-            this.classrooms = res.classes;
             this.times = res.horaires;
             this.days = res.jours;
             this.faculty = res.faculte;
@@ -78,10 +80,8 @@ export class FacultyService {
             this.teachersDomains = res.domaines_enseignants;
             this.academicYear = res.annee_scolaire;
             this.coursesRepartition = res.repartition_cours;
-
+            this.setFacultyClassrooms(res.classes);
             this.attributeStudentsNumberToCoursesGroups();
-
-            console.log(res);
 
             this.hasLoadedDatas = true;
             resolve(res);
@@ -94,12 +94,12 @@ export class FacultyService {
     }))
   }
 
-  private attributeStudentsNumberToCoursesGroups()
+  private attributeStudentsNumberToCoursesGroups(courseGroups: GroupeCours[] = this.coursesGroups)
   {
-    this.coursesGroups.forEach((group, index, newCoursesGroups) =>{
-      newCoursesGroups[index] = {
-        ...group,
-        nbre_etudiants: this.getACourseGroupStudentsNumber(group)
+    courseGroups.forEach((group) =>{
+      const groupIndex = this.coursesGroups.indexOf(group);
+      if (groupIndex > -1) {
+        this.coursesGroups[groupIndex].nbre_etudiants = this.getACourseGroupStudentsNumber(group.id as number);
       }
     })
   }
@@ -134,6 +134,15 @@ export class FacultyService {
   setFacultyTeachers(newTeachers: Enseignant[])
   {
     this.teachers = newTeachers;
+  }
+
+  get facultySupervisors()
+  {
+    return this.supervisors.sort((a, b) => a.noms.localeCompare(b.noms));
+  }
+  setFacultySupervisors(newSupervisors: Supervisor[])
+  {
+    this.supervisors = newSupervisors;
   }
 
   get facultyDomains(){
@@ -193,25 +202,14 @@ export class FacultyService {
 
   get facultyClassrooms()
   {
-    return this.classrooms
-      .sort((a, b) =>{
-        const sectorA: any = this.sectors.find(sector => sector.id === a.filiereId);
-        const sectorB: any = this.sectors.find(sector => sector.id === b.filiereId);
-        const levelA: any = this.levels.find(level => level.id === a.niveauId);
-        const levelB: any = this.levels.find(level => level.id === b.niveauId);
-        if(sectorA.code.localeCompare(sectorB.code) === 0 && levelB.code.localeCompare(levelA.code) < 0)
-        {
-          return a.code.localeCompare(b.code) <= 0;
-        }
-        else
-        {
-          return ((sectorA.code.localeCompare(sectorB.code) ||  a.code.localeCompare(b.code)) || (levelA.code.localeCompare(levelB.code)));
-        }
-      });
+    return this.classrooms;
   }
   setFacultyClassrooms(newClassrooms: Classe[])
   {
-    this.classrooms = newClassrooms
+    this.classrooms = newClassrooms;
+	  this.classrooms.sort((a, b) =>{
+		  return ((a.id ?? 0) + (a.filiereId ?? 0) + (a.niveauId ?? 0)) - ((b.id ?? 0) + (b.filiereId ?? 0) + (b.niveauId ?? 0));
+	  });
   }
   get facultyTutorials()
   {
@@ -311,17 +309,18 @@ export class FacultyService {
       studentsNumber += studentData.nbre;
     });
 
-    return studentsNumber;
+    return studentsNumber === 0 ? 1000 : studentsNumber;
   }
 
-  getACourseGroupStudentsNumber(group: GroupeCours)
+  getACourseGroupStudentsNumber(groupId: number)
   {
-    let classroom: any = this.classrooms.find(elt => elt.id = group.classeId);
+    const group = this.coursesGroups.find(elt => elt.id === groupId);
+    // let classroom: any = this.facultyClassrooms.find(elt => elt.id = group.classeId);
 
     let studentsNumber = 0;
 
-    this.getAClassroomInfos(classroom.id).forEach((data) =>{
-      if(data.lettre.localeCompare(group.lettre_debut) > -1 && data.lettre.localeCompare(group.lettre_fin) < 1)
+    this.getAClassroomInfos(group?.classeId as number).forEach((data) =>{
+      if(data.lettre.localeCompare(group?.lettre_debut ?? '') > -1 && data.lettre.localeCompare(group?.lettre_fin ?? '') < 1)
       {
         studentsNumber += data.nbre;
       }
@@ -347,29 +346,35 @@ export class FacultyService {
     return this.coursesGroups.filter((group => group.classeId === classroomId));
   }
 
-  setCoursesGroupsOfOneClassroom(classroomId: any, newGroups: GroupeCours[], newClassroomData: any = null)
+  setCoursesGroupsOfOneClassroom(classroomId: any, newGroups: GroupeCours[])
   {
-    this.coursesGroups = this.coursesGroups.filter(group => group.classeId !== classroomId);
-    newGroups.forEach((group) =>{
-      this.coursesGroups.push(group);
-    });
+    newGroups = newGroups.map((group) =>({
+      ...group,
+      classeId: classroomId
+    }))
+    this.coursesGroups = this.coursesGroups.filter(group => group.classeId !== classroomId)
+      .concat(newGroups);
 
-    this.attributeStudentsNumberToCoursesGroups();
-
-    if(newClassroomData !== null)
-    {
-      this.updateAFacultyClassroom(classroomId, newClassroomData);
-    }
+    this.attributeStudentsNumberToCoursesGroups(newGroups);
   }
 
-  updateAFacultyClassroom(classroomId: number, newClassroomData: Classe)
+  updateAFacultyClassroom(newClassroomData: Classe)
   {
-    this.classrooms.forEach((classroom, index, newClassrooms) =>{
-      if(classroom.id === classroomId)
-      {
-        newClassrooms[index] = newClassroomData;
+    for (let i = 0; i < this.classrooms.length; i++) {
+      if (this.classrooms[i].id === newClassroomData.id) {
+        this.classrooms[i] = {
+          ...this.classrooms[i],
+          ...newClassroomData
+        }
+        break;
       }
-    })
+    }
+    // this.classrooms.forEach((classroom, index, newClassrooms) =>{
+    //   if(classroom.id === classroomId)
+    //   {
+    //     newClassrooms[index] = newClassroomData;
+    //   }
+    // });
   }
 
   getTeachingUnitsOfOneClassroom(classroomId: number)
@@ -394,9 +399,17 @@ export class FacultyService {
 
   getAClassroomByCode(classroomCode: string | null)
   {
-    let temp = this.classrooms.find(classroom => classroom.code === classroomCode);
-    let classroomId: any = temp ? temp.id : null;
-    return this.getAClassroomById(classroomId);
+    let classroom = this.classrooms.find(classroom => classroom.code === classroomCode);
+    return classroom ? {
+      infos: classroom,
+      hasGroups: this.getCoursesGroupsOfOneClassroom(classroom.id as number).length !== 0,
+      groups: this.getCoursesGroupsOfOneClassroom(classroom.id as number),
+      teachingUnits: this.getTeachingUnitsOfOneClassroom(classroom.id as number),
+      studentsNumber: this.getAClassroomStudentsNumber(classroom.id as number),
+      sector: this.sectors.find((sector) =>{
+        return classroom?.filiereId === sector.id;
+      })
+    }: {};
   }
 
   get facultyAcademicYear()
@@ -519,7 +532,6 @@ export class FacultyService {
 
       if(hasFound)
       {
-        console.log("Ok")
         groups[foundIndex] = {
           ...groups[foundIndex],
           name: "Grp" + (foundIndex + 1),
@@ -541,14 +553,13 @@ export class FacultyService {
     let groupsCreation = this.proposeAClassroomDivisionToFitARoomCapacity(classroomId, roomCapacity);
     let groups: GroupeCours[] = [];
     let temp = this.getMaxCoursesGroupId();
-    console.log(groupsCreation)
 
     groupsCreation.forEach((elt) =>{
       temp = temp + 1;
       groups.push({
-        lettre_fin: elt.startLetter,
+        lettre_fin: elt.endLetter,
         nom: elt.name,
-        lettre_debut: elt.endLetter,
+        lettre_debut: elt.startLetter,
         nbre_etudiants: elt.studentsNumber,
         classeId: classroomId,
         id: temp,
@@ -556,15 +567,17 @@ export class FacultyService {
     });
 
     let classroom = this.classrooms.find(elt => elt.id === classroomId);
+    /*console.log(classroomId);
+    console.log(classroom?.id);
+    console.log('---');*/
     if(classroom)
     {
-      classroom = {
+      this.classrooms[this.classrooms.indexOf(classroom)] = {
         ...classroom,
         est_divisee: 1
       }
     }
-
-    this.setCoursesGroupsOfOneClassroom(classroomId, groups, classroom)
+    this.setCoursesGroupsOfOneClassroom(classroom?.id ?? 0, groups)
   }
 
   getMaxCoursesGroupId()

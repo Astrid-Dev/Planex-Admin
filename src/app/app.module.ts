@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule, HTTP_INTERCEPTORS, HttpClient } from "@angular/common/http";
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { NgxSmartModalModule } from 'ngx-smart-modal';
 import {AutocompleteLibModule} from 'angular-ng-autocomplete';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -57,10 +54,12 @@ import { ModalCoursesPlanningGenerationComponent } from './components/modal-cour
 import { TutorialsTimeTableComponent } from './components/tutorials-time-table/tutorials-time-table.component';
 import { MultiTutorialsTimeTableComponent } from './components/multi-tutorials-time-table/multi-tutorials-time-table.component';
 
-// Factory function required during AOT compilation
-export function httpTranslateLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http);
-}
+import {TranslateLoader, TranslateModule} from '@ngx-translate/core';
+import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
+import { PlanningExamsComponent } from './pages/planning-exams/planning-exams.component';
+import { ExamPeriodSelectionComponent } from './components/exam-period-selection/exam-period-selection.component';
+import { FileInputSupervisorsComponent } from './pages/file-input-supervisors/file-input-supervisors.component';
 
 @NgModule({
   declarations: [
@@ -109,18 +108,20 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
     ModalSectorEditionComponent,
     ModalCoursesPlanningGenerationComponent,
     TutorialsTimeTableComponent,
-    MultiTutorialsTimeTableComponent
+    MultiTutorialsTimeTableComponent,
+    PlanningExamsComponent,
+    ExamPeriodSelectionComponent,
+    FileInputSupervisorsComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     NgxPaginationModule,
-    TranslateModule.forChild(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
-        useFactory: httpTranslateLoaderFactory,
+        useFactory: HttpLoaderFactory,
         deps: [HttpClient]
       }
     }),
@@ -134,3 +135,7 @@ export function httpTranslateLoaderFactory(http: HttpClient) {
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+
+export function HttpLoaderFactory(http: HttpClient): TranslateHttpLoader {
+  return new TranslateHttpLoader(http);
+}

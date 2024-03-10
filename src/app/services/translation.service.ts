@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import {TranslateService} from "@ngx-translate/core";
 
-const LAGUAGE_KEY = "LANGUAGE";
+const LANGUAGE_KEY = "LANGUAGE";
 
 @Injectable({
   providedIn: 'root'
@@ -15,11 +15,12 @@ export class TranslationService {
     translate.addLangs(this.langsList);
 
     setTimeout(() =>{
-      const lang = localStorage.getItem(LAGUAGE_KEY);
+      const lang = localStorage.getItem(LANGUAGE_KEY);
+      console.log(lang);
       if(lang)
       {
-        translate.setDefaultLang(lang);
-        this.currentLang = lang;
+        translate.setDefaultLang(JSON.parse(lang));
+        this.currentLang = JSON.parse(lang);
       }
       else
       {
@@ -35,7 +36,7 @@ export class TranslationService {
     {
       this.translate.use(newLang);
       this.currentLang = newLang;
-      localStorage.setItem(LAGUAGE_KEY, newLang);
+      localStorage.setItem(LANGUAGE_KEY, JSON.stringify(newLang));
     }
   }
 

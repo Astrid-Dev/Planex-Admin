@@ -5,15 +5,15 @@
     <div class="form-group col-md-6 col-sm-12">
       <i class="fa fa-search"></i>
       <div class="flex-row">
-        <select [(ngModel)]="prefferedDepartmentId" (ngModelChange)="onDepartmentChange()" class="form-control">
+        <select [(ngModel)]="preferredDepartmentId" (ngModelChange)="onDepartmentChange()" class="form-control">
           <option value="{{-1}}">{{'CLASSROOMSLIST.ALLDEPARTMENTS' | translate}}</option>
           <option *ngFor="let dept of departments" [value]="dept.id">{{getDepartmentName(dept)}}</option>
         </select>
-        <select [(ngModel)]="prefferdSectorId" (ngModelChange)="onSectorChange()" class="form-control">
+        <select [(ngModel)]="preferredSectorId" (ngModelChange)="onSectorChange()" class="form-control">
           <option value="-1">{{'CLASSROOMSLIST.ALLSECTORS' | translate}}</option>
           <option *ngFor="let sector of sectors" [value]="sector.id">{{sector.code}}</option>
         </select>
-        <select [(ngModel)]="prefferdLevelId" (ngModelChange)="filter()" class="form-control">
+        <select [(ngModel)]="preferredLevelId" (ngModelChange)="filter()" class="form-control">
           <option value="-1">{{'CLASSROOMSLIST.ALLLEVELS' | translate}}</option>
           <option *ngFor="let level of levels" [value]="level.id">{{level.code}}</option>
         </select>
@@ -44,7 +44,7 @@
     <div (click)="onChooseClassroom(classroom)" class="classroom-item cursor-pointer flex-column center" [title]="getClassroomEntitled(classroom)" *ngFor="let classroom of classroomsList;">
       <h5>{{classroom.code}}</h5>
       <div class="text-italic">
-        <span class="classroom-mini-info">{{getClassroomDescription(classroom.id)}}</span>
+        <span class="classroom-mini-info">{{getClassroomDescription(classroom.id, classroom.students_count ?? 0)}}</span>
         <span *ngIf="getClassroomGroupsNumber(classroom.id) > 0"> / {{'CLASSROOMSLIST.DIVIDED' | translate}} {{getClassroomGroupsNumber(classroom.id)}} {{'CLASSROOMSLIST.GROUPS' | translate}}</span>
       </div>
     </div>

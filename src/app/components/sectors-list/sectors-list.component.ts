@@ -92,7 +92,7 @@ export class SectorsListComponent implements OnInit {
       return this.translationService.getValueOf("SECTORSLIST.UNDEFINEDTIME");
     }
     else{
-      let timeType: any = this.facultyService.times.find(time => time.id === timeTypeId);
+      let timeType: any = this.facultyService.facultyTimes.find(time => time.id === timeTypeId);
       let periods = timeType.periodes;
       let description = "";
       const length = 3

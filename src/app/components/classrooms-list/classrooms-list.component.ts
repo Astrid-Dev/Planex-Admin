@@ -24,9 +24,9 @@ export class ClassroomsListComponent implements OnInit {
   hasLoadedDatas: boolean | null = null;
   searchText: string = "";
   classroomsList: Classe[] = [];
-  prefferdSectorId: string = "-1";
-  prefferdLevelId: string = "-1";
-  prefferedDepartmentId: string = "-1";
+  preferredSectorId: string = "-1";
+  preferredLevelId: string = "-1";
+  preferredDepartmentId: string = "-1";
 
   constructor(
     private facultyService: FacultyService,
@@ -94,21 +94,21 @@ export class ClassroomsListComponent implements OnInit {
 
   onDepartmentChange()
   {
-    this.prefferdSectorId = "-1";
+    this.preferredSectorId = "-1";
     this.filter();
   }
 
   onSectorChange()
   {
-    let temp = this.sectors.find(elt => elt.id === parseInt(this.prefferdSectorId));
+    let temp = this.sectors.find(elt => elt.id === parseInt(this.preferredSectorId));
 
     if(temp)
     {
-      this.prefferedDepartmentId = ""+temp.departementId;
+      this.preferredDepartmentId = ""+temp.departementId;
     }
     else{
-      this.prefferdSectorId = "-1";
-      this.prefferedDepartmentId = "-1";
+      this.preferredSectorId = "-1";
+      this.preferredDepartmentId = "-1";
     }
     this.filter();
   }
@@ -116,9 +116,9 @@ export class ClassroomsListComponent implements OnInit {
   filter()
   {
     this.classroomsList = this.classrooms;
-    const sectorId = parseInt(this.prefferdSectorId);
-    const levelId = parseInt(this.prefferdLevelId);
-    const departmentId = parseInt(this.prefferedDepartmentId);
+    const sectorId = parseInt(this.preferredSectorId);
+    const levelId = parseInt(this.preferredLevelId);
+    const departmentId = parseInt(this.preferredDepartmentId);
     if(this.searchText !== "")
     {
       this.classroomsList = this.classroomsList
@@ -155,16 +155,15 @@ export class ClassroomsListComponent implements OnInit {
     this.selectedClassroom.emit(classroom);
   }
 
-  getClassroomDescription(classroomId: any)
+  getClassroomDescription(classroomId: any, studentsNumber: number)
   {
-    let studentsNumber = this.facultyService.getAClassroomStudentsNumber(classroomId);
     let description = studentsNumber + " " +this.translationService.getValueOf("CONFIGURATIONS.COURSESGROUPS.STUDENT") + (studentsNumber > 1 ? 's' : '');
     return description;
   }
 
   get sectors()
   {
-    return (this.prefferedDepartmentId !== "-1") ? this.facultyService.getADepartmentSectors(parseInt(this.prefferedDepartmentId)) : this.facultyService.facultySectors;
+    return (this.preferredDepartmentId !== "-1") ? this.facultyService.getADepartmentSectors(parseInt(this.preferredDepartmentId)) : this.facultyService.facultySectors;
   }
 
   get levels()
@@ -184,22 +183,22 @@ export class ClassroomsListComponent implements OnInit {
 
   get showGlobalPlanningItem()
   {
-    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId === "-1" && this.prefferedDepartmentId === "-1";
+    return this.showGlobal && this.searchText === "" && this.preferredLevelId === "-1" && this.preferredSectorId === "-1" && this.preferredDepartmentId === "-1";
   }
 
   get showDepartmentPlanningItem()
   {
-    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId === "-1" && this.prefferedDepartmentId !== "-1";
+    return this.showGlobal && this.searchText === "" && this.preferredLevelId === "-1" && this.preferredSectorId === "-1" && this.preferredDepartmentId !== "-1";
   }
 
   get showSectorPlanningItem()
   {
-    return this.showGlobal && this.searchText === "" && this.prefferdLevelId === "-1" && this.prefferdSectorId !== "-1";
+    return this.showGlobal && this.searchText === "" && this.preferredLevelId === "-1" && this.preferredSectorId !== "-1";
   }
 
   get preferredSectorCode()
   {
-    let sectorId = parseInt(this.prefferdSectorId);
+    let sectorId = parseInt(this.preferredSectorId);
 
     if(sectorId !== -1)
     {
@@ -212,7 +211,7 @@ export class ClassroomsListComponent implements OnInit {
 
   get preferredDepartmentName()
   {
-    let deptId = parseInt(this.prefferedDepartmentId);
+    let deptId = parseInt(this.preferredDepartmentId);
 
     if(deptId !== -1)
     {
@@ -232,14 +231,14 @@ export class ClassroomsListComponent implements OnInit {
 
   onDepartmentPlanningClick()
   {
-    let departmentId = parseInt(this.prefferedDepartmentId);
+    let departmentId = parseInt(this.preferredDepartmentId);
     let department: any = this.departments.find(elt => elt.id === departmentId);
     this.selectedDepartment.emit(department);
   }
 
   onSectorPlanningClick()
   {
-    let sectorId = parseInt(this.prefferdSectorId);
+    let sectorId = parseInt(this.preferredSectorId);
     let sector: any = this.sectors.find(elt => elt.id === sectorId);
     this.selectedSector.emit(sector);
   }

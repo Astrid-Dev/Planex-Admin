@@ -380,8 +380,6 @@ export class ModalCourseGroupsConfigurationComponent implements OnInit, AfterVie
       est_divisee: this.dividedClassroom === "yes" ? 2 : 1
     }
 
-    this.facultyService.setCoursesGroupsOfOneClassroom(this.classroom.id, newGroups, newClassroomData);
-
     this.isLoading = false;
     this.modal.close();
     Swal.fire({

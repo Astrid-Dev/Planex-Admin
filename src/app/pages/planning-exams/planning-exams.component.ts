@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import {Breadcumb} from "../../components/page-header-row/page-header-row.component";
 import {Classe} from "../../models/Classe";
 import {Filiere} from "../../models/Filiere";
@@ -10,15 +10,20 @@ import {PlanningCoursesService} from "../../services/planning-courses.service";
 import {ActivatedRoute, NavigationEnd, Router} from "@angular/router";
 import {NgxSmartModalService} from "ngx-smart-modal";
 import Swal from "sweetalert2";
+import {DataManagementService} from "../../services/data-management.service";
+import {Exam} from "../../models/Exam";
+import {FormBuilder, FormGroup, Validators} from "@angular/forms";
 
 const MODAL_ID = "coursesPlanningGenerationModal";
 
 @Component({
-  selector: 'app-planning-tutorials',
-  templateUrl: './planning-tutorials.component.html',
-  styleUrls: ['./planning-tutorials.component.scss']
+  selector: 'app-planning-exams',
+  templateUrl: './planning-exams.component.html',
+  styleUrls: ['./planning-exams.component.scss']
 })
-export class PlanningTutorialsComponent implements OnInit {
+export class PlanningExamsComponent {
+
+
   pageTitle: string = "";
   breadcumbs: Breadcumb[] = [];
 
@@ -45,13 +50,22 @@ export class PlanningTutorialsComponent implements OnInit {
 
   modal: any = null;
 
+  exams: Exam[] = [];
+
+  newExamForm!: FormGroup;
+  newExamFormIsSubmitted: boolean = false;
+
+  datesList: {date: Date; isChecked: boolean}[] = [];
+
   constructor(
     private translationService: TranslationService,
     private facultyService: FacultyService,
     private planningCoursesService: PlanningCoursesService,
     private router: Router,
     private route: ActivatedRoute,
-    private ngxSmartModalService: NgxSmartModalService
+    private ngxSmartModalService: NgxSmartModalService,
+    private dataManagementService: DataManagementService,
+    private formBuilder: FormBuilder
   ) {
     router.events
       .subscribe(event =>
@@ -94,7 +108,7 @@ export class PlanningTutorialsComponent implements OnInit {
             this.hasSelectedDepartment = false;
             this.currentActionZone = ActionZone.GLOBAL;
             this.currentActionZoneId = null;
-            if(this.route.snapshot.queryParamMap.get("filter") && this.route.snapshot.queryParamMap.get("filter") === "all")
+            if (this.route.snapshot.queryParamMap.get("filter") && this.route.snapshot.queryParamMap.get("filter") === "all")
             {
               this.hasSelectedGlobalPlanning = true;
             }
@@ -110,14 +124,14 @@ export class PlanningTutorialsComponent implements OnInit {
   ngOnInit(): void {
     this.loadDatas();
 
-    this.pageTitle = "PLANNINGS.TUTORIALS.TITLE"
+    this.pageTitle = "PLANNINGS.EXAMS.TITLE"
     this.breadcumbs.push(
       {
         linkName: "SIDEMENU.PLANNING.TITLE",
         link: "configurations"
       },
       {
-        linkName: "SIDEMENU.PLANNING.TUTORIALS"
+        linkName: "SIDEMENU.PLANNING.EXAMS"
       }
     );
   }
@@ -131,28 +145,71 @@ export class PlanningTutorialsComponent implements OnInit {
     this.loadClassrooms();
     this.loadPlannings();
   }
-  loadClassrooms()
+  async loadClassrooms()
   {
     this.hasLoadedClassrooms = null;
-    if(!this.facultyService.hasLoaded)
-    {
-      this.facultyService.findOneFacultyWithSubsDatas(1)
-        .then((res) =>{
-          this.verifyClassroomCode();
-          this.verifySectorCode();
+    try {
+      if(!this.dataManagementService.hasSyncedData)
+      {
+        const data: any = await this.facultyService.findOneFacultyWithSubsDatas(1);
+        this.dataManagementService.syncData(data);
+        this.verifyClassroomCode();
+        this.verifySectorCode();
+        this.hasLoadedClassrooms = true;
+      }
+      else
+      {
+        const data = await Promise.all([
+          this.dataManagementService.getClasses(),
+          this.dataManagementService.getSectors(),
+          this.dataManagementService.getDepartments(),
+          this.dataManagementService.getLevels(),
+          this.dataManagementService.getRooms(),
+          this.dataManagementService.getTeachers(),
+          this.dataManagementService.getTeachingUnits(),
+          this.dataManagementService.getScheduleTypes(),
+          this.dataManagementService.getCoursesRepartition(),
+          this.dataManagementService.getExams()
+        ]);
+        console.log(data[0]);
+        this.facultyService.setFacultyClassrooms(data[0]);
+        this.facultyService.setFacultySectors(data[1]);
+        this.facultyService.setFacultyDepartments(data[2]);
+        this.facultyService.setFacultyLevels(data[3]);
+        this.facultyService.setFacultyRooms(data[4]);
+        this.facultyService.setFacultyTeachers(data[5]);
+        this.facultyService.setFacultyTeachingUnits(data[6]);
+        this.facultyService.setFacultyTimesType(data[7]);
+        this.facultyService.setFacultyCoursesRepartition(data[8]);
+        this.exams = data[9];
 
-          this.hasLoadedClassrooms = true;
-        })
-        .catch((err) =>{
-          console.error(err);
-          this.hasLoadedClassrooms = false;
-        });
-    }
-    else
-    {
-      this.verifyClassroomCode();
-      this.verifySectorCode();
-      this.hasLoadedClassrooms = true;
+        if (!this.currentExam) {
+          this.newExamForm = this.formBuilder.group({
+            semester: [null, [Validators.required, Validators.min(1), Validators.max(2)]],
+            schoolYear: [null, [Validators.required]],
+            startDate: [null, [Validators.required]],
+            endDate: [null, [Validators.required]],
+          });
+
+          this.newExamForm.controls.startDate.valueChanges.subscribe({
+            next: (value) => {
+              this.datesList = [];
+            }
+          });
+
+          this.newExamForm.controls.endDate.valueChanges.subscribe({
+            next: (value) => {
+              this.datesList = [];
+            }
+          });
+        }
+        this.verifyClassroomCode();
+        this.verifySectorCode();
+        this.hasLoadedClassrooms = true;
+      }
+    } catch (error) {
+      console.error(error);
+      this.hasLoadedClassrooms = false;
     }
   }
 
@@ -174,6 +231,7 @@ export class PlanningTutorialsComponent implements OnInit {
     }
   }
 
+
   get canDisplay()
   {
     return (this.facultyService.facultyTeachers.length > 0 &&
@@ -183,10 +241,6 @@ export class PlanningTutorialsComponent implements OnInit {
       this.facultyService.facultyCoursesRepartition.length > 0 &&
       this.facultyService.facultyTimes.length > 0
     );
-  }
-
-  get canDisplay2(){
-    return this.canDisplay && this.hasAlreadyGenerateCoursesPlanning;
   }
 
   get canShowClassroomsList()
@@ -226,7 +280,7 @@ export class PlanningTutorialsComponent implements OnInit {
 
   get classrooms()
   {
-    return this.facultyService.facultyClassrooms;
+    return this.facultyService.classrooms;
   }
 
   get departments()
@@ -237,6 +291,15 @@ export class PlanningTutorialsComponent implements OnInit {
   get sectors()
   {
     return this.facultyService.facultySectors;
+  }
+
+  get currentExam() {
+    return this.exams.find(elt => elt.facultyId === 1);
+  }
+
+  get newExamFormControls()
+  {
+    return this.newExamForm.controls;
   }
 
   verifyClassroomCode()
@@ -314,26 +377,84 @@ export class PlanningTutorialsComponent implements OnInit {
 
   onSelectAAllClassrooms()
   {
-    this.router.navigate(["plannings/tutorials"], {queryParams: {filter: "all"}});
+    this.openModal({filter: "all"}, this.translationService.getValueOf("PLANNINGS.COURSES.NOPLANNING"), ActionZone.GLOBAL);
+    //this.router.navigate(["plannings/courses"], {queryParams: {filter: "all"}});
   }
 
   onSelectDepartmentClassrooms(department: Departement)
   {
-    this.router.navigate(["plannings/tutorials"], {queryParams: {department: this.translationService.getCurrentLang() === "fr" ? department.nom : department.nom_en}});
+    this.openModal({department: this.translationService.getCurrentLang() === "fr" ? department.nom : department.nom_en}, this.translationService.getValueOf("PLANNINGS.COURSES.NODEPARTMENTPLANNING"), ActionZone.DEPARTMENT, department.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {department: this.translationService.getCurrentLang() === "fr" ? department.nom : department.nom_en}});
   }
 
   onSelectSectorClassrooms(sector: Filiere)
   {
-    this.router.navigate(["plannings/tutorials"], {queryParams: {filter: sector.code}});
+    this.openModal({sector: sector.code}, this.translationService.getValueOf("PLANNINGS.COURSES.NOSECTORPLANNING"), ActionZone.SECTOR, sector.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {filter: sector.code}});
   }
 
   onSelectClassroom(classroom: Classe)
   {
-    this.router.navigate(["plannings/tutorials"], {queryParams: {classroom: classroom.code}});
+    this.openModal({classroom: classroom.code}, this.translationService.getValueOf("PLANNINGS.COURSES.NOCLASSROOMPLANNING"), ActionZone.CLASSROOM, classroom.id);
+    //this.router.navigate(["plannings/courses"], {queryParams: {classroom: classroom.code}});
   }
 
-  get hasAlreadyGenerateCoursesPlanning(){
-    return this.planningCoursesService.plannings.length > 0
+  openModal(queryParams: any, alertText: string, actionZone: ActionZone, itemId: any = null)
+  {
+    Swal.fire({
+      text: alertText,
+      icon: "question",
+      showDenyButton: true,
+      showCancelButton: true,
+      confirmButtonText: this.translationService.getValueOf("SUBMITS.YES"),
+      denyButtonText: this.translationService.getValueOf("SUBMITS.NO"),
+      cancelButtonText: this.translationService.getValueOf("SUBMITS.CANCEL")
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.modal.setData({actionZone: actionZone, queryParams: queryParams, itemId: itemId}, true);
+        this.modal.open();
+      } else if (result.isDenied) {
+        this.router.navigate(["plannings/courses"], {queryParams: queryParams});
+      }
+    })
   }
 
+  onSubmitDates() {
+    this.newExamFormIsSubmitted = true;
+    if (!this.newExamForm.valid) {
+      return;
+    }
+
+    const startDate = new Date(this.newExamForm.value.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    const endDate = new Date(this.newExamForm.value.endDate);
+    endDate.setHours(23, 59, 59, 999);
+
+    if (endDate.getTime() < startDate.getTime()) {
+      Swal.fire({
+        title: this.translationService.getValueOf('PLANNINGS.EXAMS.NEWEXAMFORM.INVALIDDATES'),
+        text: this.translationService.getValueOf('PLANNINGS.EXAMS.NEWEXAMFORM.INVALIDDATESERROR'),
+        icon: "error",
+      });
+      return;
+    }
+
+    if (new Date().getTime() > endDate.getTime() || new Date().getTime() > startDate.getTime()) {
+      Swal.fire({
+        title: this.translationService.getValueOf('PLANNINGS.EXAMS.NEWEXAMFORM.INVALIDDATES'),
+        text: this.translationService.getValueOf('PLANNINGS.EXAMS.NEWEXAMFORM.PASSEDDATE'),
+        icon: "error",
+      });
+      return;
+    }
+
+    let currentDate = startDate;
+    while(currentDate.getTime() <= endDate.getTime()) {
+      this.datesList.push({
+        date: currentDate,
+        isChecked: true
+      });
+      currentDate = new Date(currentDate.getTime() + (24 * 60 * 60 * 1000));
+    }
+  }
 }

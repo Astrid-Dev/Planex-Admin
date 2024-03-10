@@ -60,7 +60,6 @@ export class PlanningCoursesService {
       this.http.get(PLANNING_COURSES_URL)
         .subscribe(
           (res: any) =>{
-            console.log(res);
             this.plannings$ = res;
             this.hasLoadedPlannings = true;
             resolve(res);
@@ -129,6 +128,7 @@ export class PlanningCoursesService {
 
   generateAClassroomCoursesPlanning(parameter: GeneratePlanningParameter)
   {
+    // console.log(parameter.classroom)
     let classroom: any = parameter.classroom;
     let teachingUnits: Ue[] = [];
     let rooms = parameter.rooms;
@@ -142,15 +142,12 @@ export class PlanningCoursesService {
     let teachingUnitsPerDay = parameter.teachingUnitsPerDay;
     let oneTeachingUnitPerWeek = parameter.oneTeachingUnitPerWeek;
     let periodsBetweenTwoTeachingUnits = parameter.periodsBetweenTwoTeachingUnits;
-    console.log("-------")
-    console.log(classroom);
-    console.log("------")
-
     let daysOccurences: number[] = [];
 
 
     if(classroom)
     {
+      //cette boucle permet de repartir le nombre de passage de chaque unité d'enseignement dans la semaine
       parameter.teachingUnits.forEach((elt) =>{
         for(let i = 0; i < oneTeachingUnitPerWeek; i++)
         {
@@ -160,6 +157,7 @@ export class PlanningCoursesService {
 
       let classroomPlanning: PlanningCours[] = [];
 
+      // On initialise le tableau de plannings
       let id = this.getMaxPlanningId();
       periods.forEach((period, periodIndex) =>{
         let periodId: any = period.id;
@@ -186,102 +184,126 @@ export class PlanningCoursesService {
       })
 
 
-
-      let planningIndexes = classroomPlanning.map((elt, index) => index);
+      // On recupère les index des plannings et ues qui seront utilisés
+      let planningIndexes = classroomPlanning.map((elt, index) => selectedDays.includes(elt.jourId) ? index : -1)
+												.filter(elt => elt !== -1);
       let teachingUnitsIndexes = teachingUnits.map((elt, index) => index);
 
       for(let i = 0; i < teachingUnits.length; i++)
       {
-        if(planningIndexes.length > 1)
+        if(planningIndexes.length === 0) {
+          break;
+        }
+
+        // On recupère un planning aléatoire
+        let randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+        let randomPlanning = classroomPlanning[randomPlanningIndex];
+        planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+
+        // Verifier l'ecart entre deux unités d'enseignement
+        let planningIsRespectingGap: boolean = periodsBetweenTwoTeachingUnits === 0;
+
+        if (!planningIsRespectingGap) {
+          const previousDayPlannings = classroomPlanning.filter(elt => elt.jourId === randomPlanning.jourId && elt.periodeId < randomPlanning.periodeId);
+          if (previousDayPlannings.length > 0) {
+            const planningsToCheck = previousDayPlannings.slice(Math.max(previousDayPlannings.length - periodsBetweenTwoTeachingUnits, 0));
+            planningIsRespectingGap = planningsToCheck.every(elt => elt.ueId === null && elt.salleId === null && elt.groupeCoursId === null && elt.enseignant1Id === null && elt.enseignant2Id === null && elt.enseignant3Id === null && elt.enseignant4Id === null);
+          }
+        }
+
+        if (!planningIsRespectingGap) {
+          continue;
+        }
+
+
+        /*while(planningIndexes.length > 0)
         {
-          let randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
-          let randomPlanning = classroomPlanning[randomPlanningIndex];
+          randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+          randomPlanning = classroomPlanning[randomPlanningIndex];
           planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+        }
 
-          while(planningIndexes.length > 0 && !selectedDays.includes(randomPlanning.jourId))
+        if(planningIndexes.length === 0){
+          break;
+        }*/
+
+        // On recupère une unité d'enseignement aléatoire
+        let randomTeachingUnitIndex = teachingUnitsIndexes[this.getRandomInt(0, teachingUnitsIndexes.length - 1)];
+        let randomTeachingUnit = teachingUnits[randomTeachingUnitIndex];
+        teachingUnitsIndexes = teachingUnitsIndexes.filter(elt => elt !== randomTeachingUnitIndex);
+
+        let courseRepartition = coursesRepartition.find(elt => elt.ueId === randomTeachingUnit.id);
+
+        let othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
+          if(((elt.jourId !== null && elt.
+            jourId === randomPlanning.jourId)))
           {
-            randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
-            randomPlanning = classroomPlanning[randomPlanningIndex];
-            planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
+            return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
           }
-
-          if(planningIndexes.length === 0){
-            break;
-          }
-
-          let randomTeachingUnitIndex = teachingUnitsIndexes[this.getRandomInt(0, teachingUnitsIndexes.length - 1)];
-          let randomTeachingUnit = teachingUnits[randomTeachingUnitIndex];
-          teachingUnitsIndexes = teachingUnitsIndexes.filter(elt => elt !== randomTeachingUnitIndex);
-
-          let courseRepartition = coursesRepartition.find(elt => elt.ueId === randomTeachingUnit.id);
-
-          let teachingUnit: Ue = teachingUnits[i];
-
-          let othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
-            if(((elt.jourId !== null && elt.
-              jourId === randomPlanning.jourId)))
-            {
-              return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
-            }
-            else
-            {
-              return false;
-            }
-          });
-
-
-          let teacher1Id: any = courseRepartition ? courseRepartition.enseignant1Id : null;
-          let teacher2Id: any = courseRepartition ? courseRepartition.enseignant2Id : null;
-          let teacher3Id: any = courseRepartition ? courseRepartition.enseignant3Id : null;
-          let teacher4Id: any = courseRepartition ? courseRepartition.enseignant4Id : null;
-          let teachingUnitId: any = randomTeachingUnit.id;
-          let occupatedRoomsAtThisTime: any = othersPlanningsAtThisTime.map(elt => elt.salleId);
-          let possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, parameter.classroomStudentsNumber);
-          let selectedRoomId: any = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
-
-          if(possiblesRooms.length === 0)
+          else
           {
-            coursesGroups.forEach((courseGroup) =>{
-              othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
-                if(((elt.jourId !== null && elt.
-                  jourId === randomPlanning.jourId)))
-                {
-                  return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
-                }
-                else
-                {
-                  return false;
-                }
-              });
-              occupatedRoomsAtThisTime = othersPlanningsAtThisTime.map(elt => elt.salleId);
-              possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, this.facultyService.getACourseGroupStudentsNumber(courseGroup));
-              selectedRoomId = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
-              let courseGroupId: any = courseGroup.id;
-
-              randomPlanning.ueId = teachingUnitId;
-              randomPlanning.enseignant1Id = teacher1Id;
-              randomPlanning.enseignant2Id = teacher2Id;
-              randomPlanning.enseignant3Id = teacher3Id;
-              randomPlanning.enseignant4Id = teacher4Id;
-              randomPlanning.salleId = selectedRoomId;
-              randomPlanning.groupeCoursId = courseGroupId;
-
-              randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
-              randomPlanning = classroomPlanning[randomPlanningIndex];
-              planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
-            })
+            return false;
           }
-          else{
+        });
+
+        // On recupère les enseignants venant de la repartition des cours
+        let teacher1Id: any = courseRepartition ? courseRepartition.enseignant1Id : null;
+        let teacher2Id: any = courseRepartition ? courseRepartition.enseignant2Id : null;
+        let teacher3Id: any = courseRepartition ? courseRepartition.enseignant3Id : null;
+        let teacher4Id: any = courseRepartition ? courseRepartition.enseignant4Id : null;
+        let teachingUnitId: any = randomTeachingUnit.id;
+        if (randomPlanning.classeId === 4) {
+          console.log(randomTeachingUnit)
+        }
+
+        // On recupère les salles qui peuvent contenir l'effectif de l'unité d'enseignement et qui ne sont pas occupées
+        let occupatedRoomsAtThisTime: any = othersPlanningsAtThisTime.map(elt => elt.salleId);
+        let possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, parameter.classroomStudentsNumber);
+        let selectedRoomId: any = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
+
+        if(possiblesRooms.length === 0)
+        {
+          for (let j = 0; j < coursesGroups.length; j++) {
+            if (planningIndexes.length === 0) break;
+
+            const courseGroup = coursesGroups[j];
+            othersPlanningsAtThisTime = othersPlannings.concat(classroomPlanning).filter(elt => {
+              if(((elt.jourId !== null && elt.
+                jourId === randomPlanning.jourId)))
+              {
+                return (this.timesAreConcurent(parameter.allPeriods, elt.periodeId, randomPlanning.periodeId));
+              }
+              else
+              {
+                return false;
+              }
+            });
+            occupatedRoomsAtThisTime = othersPlanningsAtThisTime.map(elt => elt.salleId);
+            possiblesRooms = this.getPossiblesRoomsForAnEffective(rooms, occupatedRoomsAtThisTime, this.facultyService.getACourseGroupStudentsNumber(courseGroup.id as number));
+            selectedRoomId = possiblesRooms.length > 0 ? possiblesRooms[0].id : null;
+            let courseGroupId: any = courseGroup.id;
+
+            // On assigne les valeurs au planning
             randomPlanning.ueId = teachingUnitId;
             randomPlanning.enseignant1Id = teacher1Id;
             randomPlanning.enseignant2Id = teacher2Id;
             randomPlanning.enseignant3Id = teacher3Id;
             randomPlanning.enseignant4Id = teacher4Id;
             randomPlanning.salleId = selectedRoomId;
+            randomPlanning.groupeCoursId = courseGroupId;
+
+            randomPlanningIndex = planningIndexes[this.getRandomInt(0, planningIndexes.length-1)];
+            randomPlanning = classroomPlanning[randomPlanningIndex];
+            planningIndexes = planningIndexes.filter(elt => elt !== randomPlanningIndex);
           }
         }
         else{
-          break;
+          randomPlanning.ueId = teachingUnitId;
+          randomPlanning.enseignant1Id = teacher1Id;
+          randomPlanning.enseignant2Id = teacher2Id;
+          randomPlanning.enseignant3Id = teacher3Id;
+          randomPlanning.enseignant4Id = teacher4Id;
+          randomPlanning.salleId = selectedRoomId;
         }
 
       }
@@ -294,12 +316,12 @@ export class PlanningCoursesService {
     }
   }
 
-  generateAGroupOfClassroomsCoursesPlanning(parameters: GeneratePlanningParameter[])
-  {
-    parameters.forEach((elt) =>{
-      this.generateAClassroomCoursesPlanning(elt);
-    });
-  }
+  // generateAGroupOfClassroomsCoursesPlanning(parameters: GeneratePlanningParameter[])
+  // {
+  //   parameters.forEach((elt) =>{
+  //     this.generateAClassroomCoursesPlanning(elt);
+  //   });
+  // }
 
   private getPossiblesRoomsForAnEffective(roomsList: Salle[], occupatedRooms: any, effective: number)
   {

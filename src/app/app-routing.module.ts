@@ -20,6 +20,8 @@ import {FileInputDomainsComponent} from "./pages/file-input-domains/file-input-d
 import {FileInputCoursesRepartitionComponent} from "./pages/file-input-courses-repartition/file-input-courses-repartition.component";
 import {FileInputDepartmentsComponent} from "./pages/file-input-departments/file-input-departments.component";
 import {PlanningTutorialsComponent} from "./pages/planning-tutorials/planning-tutorials.component";
+import {PlanningExamsComponent} from "./pages/planning-exams/planning-exams.component";
+import {FileInputSupervisorsComponent} from "./pages/file-input-supervisors/file-input-supervisors.component";
 
 const routes: Routes = [
   {
@@ -69,6 +71,10 @@ const routes: Routes = [
       {
         path: "teaching-units",
         component: FileInputTeachingUnitsComponent
+      },
+      {
+        path: "supervisors",
+        component: FileInputSupervisorsComponent
       },
       {
         path: "courses-repartition",
@@ -123,6 +129,10 @@ const routes: Routes = [
       {
         path: 'courses',
         component: PlanningCoursesComponent
+      },
+      {
+        path: 'exams',
+        component: PlanningExamsComponent
       },
       {
         path: 'tutorials',

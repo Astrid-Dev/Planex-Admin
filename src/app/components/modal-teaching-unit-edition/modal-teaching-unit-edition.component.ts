@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {NgxSmartModalComponent, NgxSmartModalService} from "ngx-smart-modal";
 import {TranslationService} from "../../services/translation.service";
 import {FacultyService} from "../../services/faculty.service";
@@ -16,14 +16,14 @@ export class ModalTeachingUnitEditionComponent implements OnInit {
 
   modal: any = null;
 
-  editTeachingUnitForm !: FormGroup;
+  editTeachingUnitForm !: UntypedFormGroup;
   isSubmitted: boolean = false;
 
   constructor(
     private ngxSmartModalService: NgxSmartModalService,
     private translationService: TranslationService,
     private facultyService: FacultyService,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) { }
 
   ngOnInit(): void {

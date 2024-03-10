@@ -406,40 +406,15 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
         }
       })
 
-      console.log(this.days)
-      console.log(selectedDays);
+      let classrooms: Classe[] = [];
+      let options: GeneratePlanningParameter[] = [];
+
       if(this.isForClassroom)
       {
-        let temp: any = this.facultyService.facultyClassrooms.find(elt => elt.id === this.itemId);
-
-        if(this.classroomShouldCreateGroups(temp?.id))
-        {
-          this.facultyService.divideAClassroomToFitARoomCapacity(temp?.id)
-        }
-
         let classroom: any = this.facultyService.facultyClassrooms.find(elt => elt.id === this.itemId);
-        let options: GeneratePlanningParameter = {
-          days: this.days,
-          teachingUnits: this.getAClassroomTeachingUnits(classroom?.id),
-          oneTeachingUnitPerWeek: this.oneTeachingUnitPerWeek.value,
-          rooms: this.rooms,
-          allPeriods: this.allPeriods,
-          periods: this.getPeriods(classroom?.filiereId),
-          academicYearId: this.facultyService.facultyAcademicYear.id,
-          classroomStudentsNumber: this.facultyService.getAClassroomStudentsNumber(classroom?.id),
-          classroom: classroom,
-          selectedDays: selectedDays,
-          teachingUnitsPerDay: this.teachingUnitsPerDay.value,
-          periodsBetweenTwoTeachingUnits: this.periodsBetweenTwoTeachingUnits.value,
-          coursesGroups: this.facultyService.getCoursesGroupsOfOneClassroom(classroom?.id),
-          coursesRepartition: this.facultyService.getAClassroomCoursesRepartition(classroom?.id)
-        }
-
-        this.planningCoursesService.generateAClassroomCoursesPlanning(options);
+        classrooms = [classroom];
       }
       else{
-        let options: GeneratePlanningParameter[] = [];
-        let classrooms: Classe[] = [];
 
         if(this.isForSector)
         {
@@ -456,45 +431,57 @@ export class ModalCoursesPlanningGenerationComponent implements OnInit, AfterVie
           classrooms = this.facultyService.facultyClassrooms.filter(elt => elt.filiereId && selectedSectorsId.includes(elt.filiereId));
         }
         else{
-          console.log(this.departmentsChecksList)
+          //console.log(this.departmentsChecksList)
           let selectedDepartmentsId = this.departmentsChecksList.map((elt) => {return elt.checked ? elt.id : null});
           selectedDepartmentsId = selectedDepartmentsId.filter(elt => elt);
-          console.log(selectedDepartmentsId);
+          //console.log(selectedDepartmentsId);
           classrooms = [];
           selectedDepartmentsId.forEach((elt) =>{
             classrooms = classrooms.concat(this.facultyService.getADepartmentClassrooms(elt));
           });
         }
+        // classrooms = classrooms.filter(elt => this.facultyService.getAClassroomStudentsNumber(elt.id) > 0);
+      }
 
-        classrooms.forEach((elt) =>{
+      console.log(this.facultyService.facultyClassrooms)
+      classrooms.forEach((elt) =>{
 
-          if(this.classroomShouldCreateGroups(elt?.id))
-          {
+        if(this.classroomShouldCreateGroups(elt?.id) && this.facultyService.getCoursesGroupsOfOneClassroom(elt.id).length === 0)
+        {
+          if ([4, 28, 1].includes(elt?.id as number)) {
             this.facultyService.divideAClassroomToFitARoomCapacity(elt?.id)
           }
+        }
 
-          let classroom: any = this.facultyService.facultyClassrooms.find(cl => cl.id === elt.id);
-          console.log(elt.id);
-          console.log(classroom)
-          options.push({
-            days: this.days,
-            teachingUnits: this.getAClassroomTeachingUnits(classroom?.id),
-            oneTeachingUnitPerWeek: this.oneTeachingUnitPerWeek.value,
-            rooms: this.rooms,
-            allPeriods: this.allPeriods,
-            periods: this.getPeriods(classroom?.filiereId),
-            academicYearId: this.facultyService.facultyAcademicYear.id,
-            classroomStudentsNumber: this.facultyService.getAClassroomStudentsNumber(classroom?.id),
-            classroom: classroom,
-            selectedDays: selectedDays,
-            teachingUnitsPerDay: this.teachingUnitsPerDay.value,
-            periodsBetweenTwoTeachingUnits: this.periodsBetweenTwoTeachingUnits.value,
-            coursesGroups: this.facultyService.getCoursesGroupsOfOneClassroom(classroom?.id),
-            coursesRepartition: this.facultyService.getAClassroomCoursesRepartition(classroom?.id)
-          });
-          this.planningCoursesService.generateAGroupOfClassroomsCoursesPlanning(options);
-        })
-      }
+        let classroom: any = this.facultyService.facultyClassrooms.find(cl => cl.id === elt.id);
+
+        //console.log(elt.id);
+        console.log(classroom)
+        options.push({
+          days: this.days,
+          teachingUnits: this.getAClassroomTeachingUnits(classroom?.id),
+          oneTeachingUnitPerWeek: this.oneTeachingUnitPerWeek.value,
+          rooms: this.rooms,
+          allPeriods: this.allPeriods,
+          periods: this.getPeriods(classroom?.filiereId),
+          academicYearId: this.facultyService.facultyAcademicYear.id,
+          classroomStudentsNumber: this.facultyService.getAClassroomStudentsNumber(classroom?.id),
+          classroom: classroom,
+          selectedDays: selectedDays,
+          teachingUnitsPerDay: this.teachingUnitsPerDay.value,
+          periodsBetweenTwoTeachingUnits: this.periodsBetweenTwoTeachingUnits.value,
+          coursesGroups: this.facultyService.getCoursesGroupsOfOneClassroom(classroom?.id),
+          coursesRepartition: this.facultyService.getAClassroomCoursesRepartition(classroom?.id)
+        });
+      })
+
+      // console.log(this.facultyService.facultyClassrooms)
+      // console.log(options.map(elt => elt.classroom))
+      // console.log(options)
+      options.forEach((option) => {
+        this.planningCoursesService.generateAClassroomCoursesPlanning(option);
+      });
+
       setTimeout(() =>{
         this.isLoading = false;
         this.close();

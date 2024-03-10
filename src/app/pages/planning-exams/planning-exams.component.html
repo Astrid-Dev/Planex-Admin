@@ -1,0 +1,126 @@
+<div class="content-wrapper">
+
+  <app-page-header-row [pageTitle]="pageTitle" [breadcumbs]="breadcumbs"></app-page-header-row>
+
+  <div class="content-body">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-xs-12">
+        <div class="card">
+          <a class="fullscreen-icon" data-action="expand"><i class="ft-maximize"></i></a>
+          <div class="card-body collapse in" *ngIf="hasLoadedDatasWithSuccess && canDisplay">
+            <ng-container *ngIf="!!currentExam">
+              <app-classrooms-list [isForPlanning]="true" (onSelectGlobalPlanning)="onSelectAAllClassrooms()" (onSelectDepartmentPlanning)="onSelectDepartmentClassrooms($event)" (onSelectSectorPlanning)="onSelectSectorClassrooms($event)" (onSelectClassroom)="onSelectClassroom($event)" [list]="classrooms" *ngIf="canShowClassroomsList" [load]="false"></app-classrooms-list>
+              <app-courses-time-table [readOnly]="false" [classroom]="selectedClassroomCode" *ngIf="canShowTimeTable"></app-courses-time-table>
+              <app-multi-courses-time-table *ngIf="canShowMultiTimeTables" [filter]="{actionZone: currentActionZone, itemId: currentActionZoneId}"></app-multi-courses-time-table>
+              <div class="not-configured-time center flex-column" *ngIf="canShowTimeTypeWarning">
+                <img width="200px" height="200px" src="assets/images/not-configured.png"/>
+                <h6 class="text-italic mt-2">{{'LOADINGERROR.TIMETYPE' | translate}} {{currentClassroomSector}}</h6>
+                <button class="btn btn-primary" (click)="goToSectorConfigurationTime()">{{'SUBMITS.CONFIGURE' | translate}}</button>
+              </div>
+            </ng-container>
+            <ng-container *ngIf="!currentExam">
+              <div class="d-flex flex-column align-items-center">
+                <h4 class="font-weight-bold">{{'PLANNINGS.EXAMS.NEWEXAMFORM.TITLE' | translate}}</h4>
+                <div class="row mt-1" style="padding: 16px">
+                  <form [formGroup]="newExamForm" (ngSubmit)="onSubmitDates()" class="col-md-6 col-sm-12">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <fieldset class="form-group">
+                          <label>{{'PLANNINGS.EXAMS.NEWEXAMFORM.SCHOOLYEAR.LABEL' | translate}} <span class="text-danger">*</span></label>
+                          <input type="text" class="form-control" placeholder="Ex: 2022-2023" formControlName="schoolYear"/>
+                          <span class="text-danger" *ngIf="newExamFormIsSubmitted && newExamFormControls.schoolYear.errors?.required">
+                            {{'PLANNINGS.EXAMS.NEWEXAMFORM.SCHOOLYEAR.REQUIRED' | translate}}
+                          </span>
+                        </fieldset>
+                      </div>
+                      <div class="col-md-6">
+                        <fieldset class="form-group">
+                          <label>{{'PLANNINGS.EXAMS.NEWEXAMFORM.SEMESTER.LABEL' | translate}} <span class="text-danger">*</span></label>
+                          <select class="form-control" formControlName="semester">
+                            <option [value]="null" selected hidden disabled>{{'PLANNINGS.EXAMS.NEWEXAMFORM.SEMESTER.PLACEHOLDER' | translate}}</option>
+                            <option [value]="semester" *ngFor="let semester of [1, 2]">{{semester}}</option>
+                          </select>
+                          <span class="text-danger" *ngIf="newExamFormIsSubmitted && newExamFormControls.semester.errors?.required">
+                            {{'PLANNINGS.EXAMS.NEWEXAMFORM.SEMESTER.REQUIRED' | translate}}
+                          </span>
+                        </fieldset>
+                      </div>
+                      <div class="col-md-6">
+                        <fieldset class="form-group">
+                          <label>{{'PLANNINGS.EXAMS.NEWEXAMFORM.STARTDATE.LABEL' | translate}} <span class="text-danger">*</span></label>
+                          <input type="date" class="form-control" formControlName="startDate"/>
+                          <span class="text-danger" *ngIf="newExamFormIsSubmitted && newExamFormControls.startDate.errors?.required">
+                            {{'PLANNINGS.EXAMS.NEWEXAMFORM.STARTDATE.REQUIRED' | translate}}
+                          </span>
+                        </fieldset>
+                      </div>
+                      <div class="col-md-6">
+                        <fieldset class="form-group">
+                          <label>{{'PLANNINGS.EXAMS.NEWEXAMFORM.ENDDATE.LABEL' | translate}} <span class="text-danger">*</span></label>
+                          <input type="date" class="form-control" formControlName="endDate"/>
+                          <span class="text-danger" *ngIf="newExamFormIsSubmitted && newExamFormControls.endDate.errors?.required">
+                            {{'PLANNINGS.EXAMS.NEWEXAMFORM.ENDDATE.REQUIRED' | translate}}
+                          </span>
+                        </fieldset>
+                      </div>
+                    </div>
+                    <button *ngIf="datesList.length === 0" type="submit" class="btn btn-outline-primary btn-block">
+                      {{'PLANNINGS.EXAMS.NEWEXAMFORM.MANAGEDATES' | translate}}
+                    </button>
+                    <button *ngIf="datesList.length > 0" type="button" class="btn btn-primary btn-block">
+                      {{'PLANNINGS.EXAMS.NEWEXAMFORM.CREATESESSION' | translate}}
+                    </button>
+                  </form>
+                  <div class="col-md-6 col-sm-12 dates-list">
+                    <div class="table-responsive">
+                      <table class="table table-bordered mb-0">
+                        <thead>
+                        <tr>
+                          <th>N°</th>
+                          <th>{{'PLANNINGS.EXAMS.NEWEXAMFORM.TABLE.HEADERS.DATE' | translate}}</th>
+                          <th>{{'PLANNINGS.EXAMS.NEWEXAMFORM.TABLE.HEADERS.STATUS' | translate}}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                          <tr *ngFor="let dateItem of datesList; index as i">
+                            <td>{{i+1}}</td>
+                            <td>{{dateItem.date.toDateString()}}</td>
+                            <td>
+                              <input type="checkbox" [checked]="dateItem.isChecked" (change)="dateItem.isChecked = !dateItem.isChecked">
+                            </td>
+                          </tr>
+                          <tr *ngIf="datesList.length === 0">
+                            <td colspan="3" class="text-italic text-md-center">{{'PLANNINGS.EXAMS.NEWEXAMFORM.TABLE.HINT' | translate}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                    <div *ngIf="!newExamFormIsSubmitted" class="mt-1">
+                      <i class="fa fa-info-circle"></i>&nbsp;
+                      <span class="small text-justify text-italic text-gray-dark">{{'PLANNINGS.EXAMS.NEWEXAMFORM.HINT' | translate}}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div class="required-file-importation center flex-column" *ngIf="hasLoadedDatasWithSuccess && !canDisplay">
+            <img width="250px" height="250px" src="assets/images/required.jpg"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.FILEIMPORTATION' | translate}}</h6>
+          </div>
+          <div class="page-loader" *ngIf="isLoading">
+            <i class="fa fa-refresh fa-pulse text-primary"></i>
+          </div>
+          <div class="loading-error mb-5" *ngIf="hasLoadedDatasWithError">
+            <img src="assets/images/loading-error.png"/>
+            <h6 class="text-italic mt-2">{{'LOADINGERROR.BACKEND' | translate}}</h6>
+            <button class="btn btn-primary" (click)="retry()">{{'SUBMITS.RETRY' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<app-modal-courses-planning-generation></app-modal-courses-planning-generation>
+

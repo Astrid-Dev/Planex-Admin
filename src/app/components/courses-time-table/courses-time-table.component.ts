@@ -255,7 +255,7 @@ export class CoursesTimeTableComponent implements OnInit, AfterViewInit {
       result = this.getTutorialCode(planningCeil.tdId);
     }
 
-    return result;
+    return result ?? this.coursesGroups.find(courseGroup => courseGroup.id === planningCeil.groupeCoursId)?.nom ?? 'Activite';
   }
 
   getPlanningRoomCodeAt(dayIndex: number, periodIndex: number)

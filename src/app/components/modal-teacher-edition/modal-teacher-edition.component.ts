@@ -1,7 +1,7 @@
 import {AfterViewInit, Component, OnInit} from '@angular/core';
 import {NgxSmartModalComponent, NgxSmartModalService} from "ngx-smart-modal";
 import {TranslationService} from "../../services/translation.service";
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {FacultyService} from "../../services/faculty.service";
 import {IDropdownSettings} from "ng-multiselect-dropdown";
 import {Domaine} from "../../models/Domaine";
@@ -17,7 +17,7 @@ export class ModalTeacherEditionComponent implements OnInit, AfterViewInit {
 
   modal: any = null;
 
-  editTeacherForm !: FormGroup;
+  editTeacherForm !: UntypedFormGroup;
   selectedDomains: Domaine[] = [];
   dropdownSettings = {};
   domainsList: Domaine[] = [];
@@ -28,7 +28,7 @@ export class ModalTeacherEditionComponent implements OnInit, AfterViewInit {
     private ngxSmartModalService: NgxSmartModalService,
     private translationService: TranslationService,
     private facultyService: FacultyService,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) {}
 
   ngOnInit(): void {

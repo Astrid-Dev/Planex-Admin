@@ -56,7 +56,7 @@ export class ModalSectiorTimeSelectionComponent implements OnInit, AfterViewInit
 
   get timesTypes()
   {
-    return this.facultyService.times;
+    return this.facultyService.facultyTimes;
   }
 
   getTimeTypeDescription(timeType: any)

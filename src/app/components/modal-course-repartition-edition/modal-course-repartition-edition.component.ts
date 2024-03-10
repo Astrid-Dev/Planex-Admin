@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {FormBuilder, FormGroup, Validators} from "@angular/forms";
+import {UntypedFormBuilder, UntypedFormGroup, Validators} from "@angular/forms";
 import {NgxSmartModalComponent, NgxSmartModalService} from "ngx-smart-modal";
 import {TranslationService} from "../../services/translation.service";
 import {FacultyService} from "../../services/faculty.service";
@@ -17,7 +17,7 @@ export class ModalCourseRepartitionEditionComponent implements OnInit {
 
   modal: any = null;
 
-  editcourseRepartionForm !: FormGroup;
+  editcourseRepartionForm !: UntypedFormGroup;
   isSubmitted: boolean = false;
 
   classrooms: Classe[] = [];
@@ -27,7 +27,7 @@ export class ModalCourseRepartitionEditionComponent implements OnInit {
     private ngxSmartModalService: NgxSmartModalService,
     private translationService: TranslationService,
     private facultyService: FacultyService,
-    private formBuilder: FormBuilder
+    private formBuilder: UntypedFormBuilder
   ) {
   }
 

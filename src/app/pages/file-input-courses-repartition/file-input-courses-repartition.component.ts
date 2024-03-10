@@ -83,7 +83,7 @@ export class FileInputCoursesRepartitionComponent implements OnInit, AfterViewIn
 
   readFileContent(resultString: string)
   {
-    this.coursesRepartitionService.extractDataFromFile(resultString, this.facultyService.currentFaculty.id)
+    this.coursesRepartitionService.extractDataFromFile(resultString, this.facultyService.currentFaculty.anneeScolaireId)
       .then((coursesRepartition) =>{
         this.coursesRepartition = coursesRepartition;
         this.syncRepartitionWithTeachersAndTeachingUnits();
